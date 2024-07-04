@@ -1,13 +1,15 @@
+// Modèle Animal
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelizeInstance from '@/lib/sequelize';
-// Retirez l'importation directe de Race pour éviter la dépendance circulaire
+import Race from './race'; // Importer directement le modèle Race
+import Habitat from './habitat'; // Importer directement le modèle Habitat
 
 interface AnimalAttributes {
     id: number;
     name: string;
     etat: string;
     raceId: number;
-    habitatId: number; // Ajout de la relation avec Habitat
+    habitatId: number;
 }
 
 interface AnimalCreationAttributes extends Optional<AnimalAttributes, 'id'> {}
@@ -17,7 +19,11 @@ class Animal extends Model<AnimalAttributes, AnimalCreationAttributes> implement
     public name!: string;
     public etat!: string;
     public raceId!: number;
-    public habitatId!: number; // Ajout de la relation avec Habitat
+    public habitatId!: number;
+
+    // Définir les associations statiques pour Sequelize
+    public readonly Race?: Race; // Relation avec Race
+    public readonly Habitat?: Habitat; // Relation avec Habitat
 }
 
 Animal.init(
@@ -72,12 +78,11 @@ Animal.init(
     }
 );
 
-// Déplacer la relation vers une fonction pour éviter les problèmes de dépendance circulaire
+// Fonction d'association des modèles
 export function associateModels() {
-    const Race = require('./race').default;
-    const Habitat = require('./habitat').default;
+    // Associations
     Animal.belongsTo(Race, { foreignKey: 'raceId' });
-    Animal.belongsTo(Habitat, { foreignKey: 'habitatId' }); // Ajout de la relation avec Habitat
+    Animal.belongsTo(Habitat, { foreignKey: 'habitatId' });
 }
 
 export default Animal;

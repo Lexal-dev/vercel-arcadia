@@ -1,13 +1,9 @@
-import FormCreate from '@/components/api/animals/FormCreate';
 import React from 'react';
 const HomePage = () => {
 
-
   return (
     <main className='flex flex-col items-center p-12'>
-      <FormCreate />
-      <div className='my-6'></div>
-
+      <h2 className='text-4xl font-bold mb-12'>-- HOME --</h2>
     </main>
   );
 };

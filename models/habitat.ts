@@ -51,11 +51,10 @@ Habitat.init(
             validate: {
                 len: {
                     args: [3, 100],
-                    msg: "La description doit être comprise entre 3 et 100 caractères",
+                    msg: "Le commentaire doit être compris entre 3 et 100 caractères",
                 },
             },
         },
-        
     },
     {
         sequelize: sequelizeInstance,

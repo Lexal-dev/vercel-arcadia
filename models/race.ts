@@ -1,6 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelizeInstance from '@/lib/sequelize';
-// Retirez l'importation directe d'Animal pour éviter la dépendance circulaire
 
 interface RaceAttributes {
     id: number;
@@ -40,8 +39,9 @@ Race.init(
     }
 );
 
-// Déplacer la relation vers une fonction pour éviter les problèmes de dépendance circulaire
+// Fonction d'association des modèles
 export function associateModels() {
+    // Import dynamique pour éviter les dépendances circulaires
     const Animal = require('./animal').default;
     Race.hasMany(Animal, { foreignKey: 'raceId' });
 }
