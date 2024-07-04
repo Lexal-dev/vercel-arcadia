@@ -1,5 +1,5 @@
 import React from 'react'
-
+import Image from 'next/image'
 export default function Presentation() {
   return (
     <>
@@ -10,9 +10,9 @@ export default function Presentation() {
         </p>
         
         <div className="flex gap-6 justify-center">
-          <img src="/images/lion.png" alt="Image du zoo 1" className="w-full h-[200px] md:h-[325px] max-w-xs rounded-md shadow-md" />
-          <img src="/images/lynx2.png" alt="Image du zoo 2" className="w-full h-[200px] md:h-[325px] max-w-xs rounded-md shadow-md" />
-          <img src="/images/Tiger.png" alt="Image du zoo 3" className="w-full h-[200px] md:h-[325px] max-w-xs rounded-md shadow-md" />
+        <Image src="/images/lion.png" alt="Image du zoo 1" width={300} height={200} className="max-w-xs rounded-md shadow-md" />
+        <Image src="/images/lynx2.png" alt="Image du zoo 2" width={300} height={200} className="max-w-xs rounded-md shadow-md" />
+        <Image src="/images/Tiger.png" alt="Image du zoo 3" width={300} height={200} className="max-w-xs rounded-md shadow-md" />
         </div>
       </section>
     </>
