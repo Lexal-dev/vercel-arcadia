@@ -7,6 +7,7 @@ interface AnimalAttributes {
     name: string;
     etat: string;
     raceId: number;
+    habitatId: number; // Ajout de la relation avec Habitat
 }
 
 interface AnimalCreationAttributes extends Optional<AnimalAttributes, 'id'> {}
@@ -16,6 +17,7 @@ class Animal extends Model<AnimalAttributes, AnimalCreationAttributes> implement
     public name!: string;
     public etat!: string;
     public raceId!: number;
+    public habitatId!: number; // Ajout de la relation avec Habitat
 }
 
 Animal.init(
@@ -32,7 +34,7 @@ Animal.init(
             validate: {
                 len: {
                     args: [3, 30],
-                    msg: "le nom doit être compris entre [3 - 30] caractères",
+                    msg: "Le nom doit être compris entre 3 et 30 caractères",
                 },
             },
         },
@@ -42,7 +44,7 @@ Animal.init(
             validate: {
                 len: {
                     args: [3, 100],
-                    msg: "le message d'etat doit être compris entre [3 - 100] caractères",
+                    msg: "Le message d'état doit être compris entre 3 et 100 caractères",
                 },
             },
         },
@@ -51,6 +53,14 @@ Animal.init(
             allowNull: false,
             references: {
                 model: 'races', // Nom de la table races
+                key: 'id',
+            },
+        },
+        habitatId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'habitats', // Nom de la table habitats
                 key: 'id',
             },
         },
@@ -65,7 +75,9 @@ Animal.init(
 // Déplacer la relation vers une fonction pour éviter les problèmes de dépendance circulaire
 export function associateModels() {
     const Race = require('./race').default;
+    const Habitat = require('./habitat').default;
     Animal.belongsTo(Race, { foreignKey: 'raceId' });
+    Animal.belongsTo(Habitat, { foreignKey: 'habitatId' }); // Ajout de la relation avec Habitat
 }
 
 export default Animal;

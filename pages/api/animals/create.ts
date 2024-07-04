@@ -8,14 +8,14 @@ export default async function createAnimal(req: NextApiRequest, res: NextApiResp
             // Synchroniser le modèle avec la base de données si nécessaire
             await Animal.sync({ alter: true });
 
-            const { name, etat, raceId } = req.body;
+            const { name, etat, raceId, habitatId } = req.body;
 
-            if (!name || !etat || !raceId) {
-                res.status(400).json({ success: false, message: 'Le nom, l\'état et l\'identifiant de la race sont requis.' });
+            if (!name || !etat || !raceId || !habitatId) {
+                res.status(400).json({ success: false, message: 'Le nom, l\'état, l\'identifiant de la race et l\'identifiant de l\'habitat sont requis.' });
                 return;
             }
 
-            const newAnimal = await Animal.create({ name, etat, raceId });
+            const newAnimal = await Animal.create({ name, etat, raceId, habitatId });
 
             res.status(200).json({ success: true, message: 'Animal créé avec succès.', animal: newAnimal });
         } catch (error) {

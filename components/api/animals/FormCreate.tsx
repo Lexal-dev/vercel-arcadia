@@ -5,26 +5,43 @@ interface Race {
     id: number;
     name: string;
 }
+interface Habitat {
+    id: number;
+    name: string;
+}
 
 export default function FormCreate() {
     const [name, setName] = useState('');
     const [etat, setEtat] = useState('');
     const [message, setMessage] = useState('');
-    const [races, setRaces] = useState<Race[]>([]); // Définir le type des races comme un tableau d'objets Race
-    const [selectedRace, setSelectedRace] = useState<number | undefined>(undefined); // Utiliser number ou undefined pour le selectedRace
+    const [races, setRaces] = useState<Race[]>([]);
+    const [habitats, setHabitats] = useState<Habitat[]>([]);
+    const [selectedRace, setSelectedRace] = useState<number | undefined>(undefined);
+    const [selectedHabitat, setSelectedHabitat] = useState<number | undefined>(undefined);
 
     useEffect(() => {
         const fetchRaces = async () => {
             try {
                 const res = await fetch('/api/races/read');
                 const data = await res.json();
-                setRaces(data.races); // Assurez-vous que votre API renvoie un objet avec une propriété races contenant le tableau de races
+                setRaces(data.races);
             } catch (error) {
                 console.error('Erreur lors de la récupération des races:', error);
             }
         };
 
+        const fetchHabitats = async () => {
+            try {
+                const res = await fetch('/api/habitats/read');
+                const data = await res.json();
+                setHabitats(data.habitats);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des habitats:', error);
+            }
+        };
+
         fetchRaces();
+        fetchHabitats();
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -36,20 +53,22 @@ export default function FormCreate() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, etat, raceId: selectedRace }),
+                body: JSON.stringify({ name, etat, raceId: selectedRace, habitatId: selectedHabitat }),
             });
 
             const data = await res.json();
 
-            if (data.success) {
+            if (res.ok) {
                 setMessage(`L'animal : ${data.animal.name} a bien été ajouté`);
                 setName('');
                 setEtat('');
                 setSelectedRace(undefined);
+                setSelectedHabitat(undefined);
             } else {
-                setMessage(data.message);
+                setMessage(data.message || 'Une erreur est survenue lors de la création de l\'animal');
             }
         } catch (error) {
+            console.error('Erreur lors de la création de l\'animal:', error);
             setMessage("Un problème est survenu lors de la création de l'animal");
         }
     };
@@ -90,6 +109,19 @@ export default function FormCreate() {
                             <option value='' disabled>Sélectionner une race</option>
                             {races.map((race) => (
                                 <option key={race.id} value={race.id}>{race.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className='flex justify-between w-full'>
+                        <label>Habitat:</label>
+                        <select
+                            value={selectedHabitat ?? ''}
+                            onChange={(e) => setSelectedHabitat(parseInt(e.target.value))}
+                            required
+                        >
+                            <option value='' disabled>Sélectionner un habitat</option>
+                            {habitats.map((habitat) => (
+                                <option key={habitat.id} value={habitat.id}>{habitat.name}</option>
                             ))}
                         </select>
                     </div>
