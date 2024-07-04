@@ -1,0 +1,41 @@
+{
+  "development": {
+    "username": "arcadia_owner",
+    "password": "fSwzKl0HnYB3",
+    "database": "arcadia",
+    "host": "ep-white-night-a2bd52ak.eu-central-1.aws.neon.tech",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  },
+  "test": {
+    "username": "arcadia_owner",
+    "password": "fSwzKl0HnYB3",
+    "database": "arcadia",
+    "host": "ep-white-night-a2bd52ak.eu-central-1.aws.neon.tech",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  },
+  "production": {
+    "username": "arcadia_owner",
+    "password": "fSwzKl0HnYB3",
+    "database": "arcadia",
+    "host": "ep-white-night-a2bd52ak.eu-central-1.aws.neon.tech",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  }
+}

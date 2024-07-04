@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import Animal from '@/lib/models/animal'; // Assurez-vous que le chemin d'import est correct
+import Animal from '@/models/animal'; // Assurez-vous que le chemin d'import est correct
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const id = typeof req.query.id === 'string' ? req.query.id : undefined;

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import BtnDelete from '@/components/api/animals/BtnDelete'
+import BtnDelete from '@/components/api/animals/BtnDelete';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -15,7 +15,7 @@ export default function FormUpdate(props: FormUpdateProps) {
 
     const [name, setName] = useState(animalName);
     const [etat, setEtat] = useState(animalEtat);
-
+    const [message, setMessage] = useState('');
 
     const router = useRouter();
     
@@ -33,15 +33,19 @@ export default function FormUpdate(props: FormUpdateProps) {
                 },
                 body: JSON.stringify({ name: updatedName, etat: updatedEtat }),
             });
-  
+
             const data = await res.json();
 
-            if (data.success) 
+            if (data.success) {
+                setMessage(`L'animal : ${data.animal.name} a bien été modifié`);
                 setName('');
                 setEtat('');
                 router.push('/');
-            } catch (error) {
-          console.error('Erreur lors de la modification de l\'animal:', error);
+            } else {
+                setMessage(data.message);
+            }
+        } catch (error) {
+            setMessage("Un problème est survenu lors de la modification de l'animal.");
         }
     };
 
@@ -50,28 +54,33 @@ export default function FormUpdate(props: FormUpdateProps) {
             <form onSubmit={handleSubmit} className='flex flex-col w-[400px] items-center justify-around gap-4 bg-slate-300 rounded-md text-black p-6'>
                 <div className='flex flex-col gap-6'>
                     <div className='flex justify-between w-full'>
-                        <label>Name:</label>
+                        <label>Nom:</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
+                            minLength={3}
+                            maxLength={50}
                         />
                     </div>
                     <div className='flex justify-between w-full'>
-                        <label>Etat:</label>
+                        <label>État:</label>
                         <input
                             type="text"
                             value={etat}
                             onChange={(e) => setEtat(e.target.value)}
                             required
+                            minLength={3}
+                            maxLength={100}
                         />
                     </div>            
                 </div>
                 <div className='flex items-center justify-around'>
-                  <button type="submit" className='bg-yellow-200 hover:bg-yellow-300 border-2 border-yellow-300 p-2 text-yellow-700'>Modifier</button>
-                  <BtnDelete animalId={animalId}/>             
-                </div>   
+                    <button type="submit" className='bg-yellow-200 hover:bg-yellow-300 border-2 border-yellow-300 p-2 text-yellow-700'>Modifier</button>
+                    <BtnDelete animalId={animalId} animalName={animalName}/>             
+                </div>
+                {message && <p className='text-red-600'>{message}</p>}
             </form>
         </>
     );

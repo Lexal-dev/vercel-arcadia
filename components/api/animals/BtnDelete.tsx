@@ -5,30 +5,37 @@ import { useRouter } from 'next/navigation';
 
 interface DeleteFormProps {
     animalId: number;
+    animalName: string;
 }
 
-export default function DeleteForm({ animalId }: DeleteFormProps) {
+export default function DeleteForm({ animalId, animalName }: DeleteFormProps) {
     const [message, setMessage] = useState('');
     const router = useRouter();
 
     const handleDelete = async () => {
-        try {
-            const res = await fetch(`/api/animals/delete?id=${animalId}`, {
-                method: 'DELETE',
-            });
+        const isConfirmed = window.confirm(`Êtes-vous sûr de vouloir supprimer ${animalName} ?`);
+        
+        if (isConfirmed) {
+            try {
+                const res = await fetch(`/api/animals/delete?id=${animalId}`, {
+                    method: 'DELETE',
+                });
 
-            const data = await res.json();
+                const data = await res.json();
 
-            if (data.success) {
-                setMessage('Animal supprimé avec succès');
-                router.push('/');
-                router.refresh();
-            } else {
-                setMessage(data.message);
+                if (data.success) {
+                    setMessage('Animal supprimé avec succès.');
+                    router.push('/');
+                    router.refresh();
+                } else {
+                    setMessage(data.message);
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression de l\'animal :', error);
+                setMessage("Un problème est survenu lors de la suppression de l'animal.");
             }
-        } catch (error) {
-            console.error('Erreur lors de la suppression de l\'animal:', error);
-            setMessage("Un problème est survenu lors de la suppression de l'animal");
+        } else {
+            setMessage("Suppression annulée.");
         }
     };
 
