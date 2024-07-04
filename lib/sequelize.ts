@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
-import pg from "pg"
+import pg from 'pg';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -27,5 +27,14 @@ const sequelizeInstance = new Sequelize(database, username, password, {
         }
     }
 });
+
+// Tester la connexion
+sequelizeInstance.authenticate()
+    .then(() => {
+        console.log('Connection has been established successfully.');
+    })
+    .catch(err => {
+        console.error('Unable to connect to the database:', err);
+    });
 
 export default sequelizeInstance;

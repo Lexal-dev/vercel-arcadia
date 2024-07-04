@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Header />
-        <div className="h-screen bg-black text-white py-[450px]">
+        <div className="min-h-screen bg-black text-white py-[450px]">
           {children}           
         </div>
       </body>

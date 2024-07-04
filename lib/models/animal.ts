@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelizeInstance from '../sequelize';
+import sequelizeInstance from '@/lib/sequelize';
 
 interface AnimalAttributes {
     id: number;
@@ -35,8 +35,8 @@ Animal.init(
     },
     {
         sequelize: sequelizeInstance,
-        tableName: 'animals', // Nom de la table dans la base de données
-        timestamps: false, // Désactive les timestamps automatiques
+        tableName: 'animals',
+        timestamps: false,
     }
 );
 

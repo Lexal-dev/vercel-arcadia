@@ -1,10 +1,16 @@
-import HomePage from "@/components/pages/HomePage";
+import FormCreate from '@/components/api/animals/FormCreate';
+import ListAnimals from '@/components/api/animals/ListAnimals';
+import React from 'react';
+const HomePage = () => {
 
-export default function Home() {
 
   return (
-    <main className="w-full h-full p-2 md:py-6 md:px-6">
-      <HomePage />
+    <main className='flex flex-col items-center p-12'>
+      <FormCreate />
+      <div className='my-6'></div>
+      <ListAnimals />
     </main>
   );
-}
+};
+
+export default HomePage;

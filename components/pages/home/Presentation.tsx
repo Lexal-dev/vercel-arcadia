@@ -10,8 +10,8 @@ export default function Presentation() {
         </p>
         
         <div className="flex gap-6 justify-center">
-        <Image src="/images/lion.png" alt="Image du zoo 1" width={300} height={200} className="max-w-xs rounded-md shadow-md" />
-        <Image src="/images/lynx2.png" alt="Image du zoo 2" width={300} height={200} className="max-w-xs rounded-md shadow-md" />
+        <Image src="/images/Lion.png" alt="Image du zoo 1" width={300} height={200} className="max-w-xs rounded-md shadow-md" />
+        <Image src="/images/Lynx2.png" alt="Image du zoo 2" width={300} height={200} className="max-w-xs rounded-md shadow-md" />
         <Image src="/images/Tiger.png" alt="Image du zoo 3" width={300} height={200} className="max-w-xs rounded-md shadow-md" />
         </div>
       </section>
