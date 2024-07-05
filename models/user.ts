@@ -1,17 +1,18 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelizeInstance from '@/lib/sequelize';
-import Role from './role'; // Importer le modèle Role
 
 interface UserAttributes {
     id: number;
     email: string;
     password: string;
+    role: string; // Ajoutez la propriété role ici
 }
 
 class User extends Model<UserAttributes> implements UserAttributes {
     public id!: number;
     public email!: string;
     public password!: string;
+    public role!: string; // Déclarez la propriété role ici
 }
 
 User.init(
@@ -33,6 +34,11 @@ User.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        role: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: 'USER', // Valeur par défaut
+        },
     },
     {
         sequelize: sequelizeInstance,
@@ -40,12 +46,5 @@ User.init(
         timestamps: false,
     }
 );
-
-// Définir la relation
-User.belongsToMany(Role, {
-    through: 'UserRole', // Nom de la table de liaison
-    foreignKey: 'userId',
-    otherKey: 'roleId',
-});
 
 export default User;
