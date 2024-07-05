@@ -101,7 +101,7 @@ const HabitatsPage: React.FC = () => {
 
     return (
         <main className='flex flex-col items-center p-12'>
-            <h2 className='text-4xl font-bold mb-12'>-- Habitats --</h2>
+            <h2 className='text-4xl font-bold mb-12'>Habitats</h2>
             <section className='grid grid-cols-3 gap-6'>
                 {habitats.map((habitat) => (
                     <div key={habitat.id} className='border-2 border-gray-200 p-4 rounded-md cursor-pointer' onClick={() => handleClickHabitat(habitat.id)}>
