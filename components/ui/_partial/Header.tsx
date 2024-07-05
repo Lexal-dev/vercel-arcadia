@@ -59,7 +59,7 @@ export default function Header() {
           ))}
         </ul>
 
-        <Link href="/login">
+        <Link href="/">
           <FaRegUserCircle size="32px" className="hover:text-yellow-300" />
         </Link>
       </nav>

@@ -1,12 +1,13 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelizeInstance from '@/lib/sequelize';
-
-interface AvisAttributes {
+export interface AvisAttributes {
     id: number;
     pseudo: string;
     comment: string;
     isValid: boolean;
 }
+
+// Définition de votre modèle Avis
+import { DataTypes, Model } from 'sequelize';
+import sequelizeInstance from '@/lib/sequelize';
 
 class Avis extends Model<AvisAttributes> implements AvisAttributes {
     public id!: number;
@@ -45,7 +46,7 @@ Avis.init(
         isValid: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: false,
+            defaultValue: false, // Définition de la valeur par défaut à false
         },
     },
     {
