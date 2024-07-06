@@ -1,19 +1,20 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelizeInstance from '@/lib/sequelize';
-import User from './user'; // Importer le modèle User
 import Animal from './animal'; // Importer le modèle Animal
 
 interface ReportAttributes {
     id: number;
-    details: string;
-    userId: number;
+    food: string;
+    quantity: number;
+    createdAt: Date;
     animalId: number;
 }
 
 class Report extends Model<ReportAttributes> implements ReportAttributes {
     public id!: number;
-    public details!: string;
-    public userId!: number;
+    public food!: string;
+    public quantity!: number;
+    public createdAt!: Date;
     public animalId!: number;
 }
 
@@ -24,23 +25,32 @@ Report.init(
             autoIncrement: true,
             primaryKey: true,
         },
-        details: {
+        food: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                len: {
-                    args: [3, 500],
-                    msg: 'Les détails du rapport doivent contenir entre 3 et 500 caractères.',
+                notEmpty: {
+                    msg: 'Le champ food ne peut pas être vide.',
                 },
             },
         },
-        userId: {
+        quantity: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: 'users', // Nom de la table users
-                key: 'id',
+            validate: {
+                isInt: {
+                    msg: 'Le champ quantity doit être un entier.',
+                },
+                min: {
+                    args: [1],
+                    msg: 'Le champ quantity doit être supérieur à zéro.',
+                },
             },
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
         },
         animalId: {
             type: DataTypes.INTEGER,
@@ -54,12 +64,11 @@ Report.init(
     {
         sequelize: sequelizeInstance,
         tableName: 'reports',
-        timestamps: false,
+        timestamps: false, // Désactiver les timestamps automatiques
     }
 );
 
 // Définir les relations
-Report.belongsTo(User, { foreignKey: 'userId' });
 Report.belongsTo(Animal, { foreignKey: 'animalId' });
 
 export default Report;

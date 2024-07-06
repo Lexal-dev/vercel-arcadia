@@ -120,7 +120,7 @@ export default function UsersManager() {
             <button
                 onClick={() => setShowForm(true)}
                 className='bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md mt-4'>
-                Ajouter Utilisateur
+                Ajouter un Utilisateur
             </button>
             {showForm && selectedUser && (
                 <FormUpdate user={selectedUser} onUpdateSuccess={handleUpdateSuccess} onClose={() => { setSelectedUser(null); setShowForm(false); }} />
