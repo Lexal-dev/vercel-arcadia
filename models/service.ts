@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelizeInstance from '@/lib/sequelize';
 
-interface ServiceAttributes {
+export interface ServiceAttributes {
     id: number;
     name: string;
     description: string;

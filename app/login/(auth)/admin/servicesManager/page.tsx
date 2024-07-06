@@ -1,13 +1,15 @@
 "use client"
-import FormCreate from '@/components/api/services/FormCreate';
-import Service from '@/models/service';
 import React, { useEffect, useState } from 'react';
+import FormCreate from '@/components/api/services/FormCreate';
+import FormUpdate from '@/components/api/services/FormUpdate'; // Assurez-vous que le chemin vers FormUpdate est correct
+import Service from '@/models/service';
 
 export default function ServicesManager() {
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [showForm, setShowForm] = useState<boolean>(false); // État pour contrôler l'affichage de la modal
+    const [showForm, setShowForm] = useState<boolean>(false); // État pour contrôler l'affichage de la modal de création
+    const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false); // État pour contrôler l'affichage du formulaire de mise à jour
     const [selectedService, setSelectedService] = useState<Service | null>(null); // État pour stocker le service sélectionné pour la modification
 
     // Fonction pour récupérer les services depuis l'API
@@ -56,10 +58,21 @@ export default function ServicesManager() {
         setShowForm(false); // Fermer la modal après création
     };
 
-    // Fonction pour ouvrir la modal de création ou de mise à jour d'un service
-    const openForm = (service: Service | null = null) => {
-        setSelectedService(service); // Définir le service sélectionné pour la modification, ou null pour la création
-        setShowForm(true); // Afficher la modal
+    // Fonction pour gérer la réussite de la mise à jour d'un service
+    const handleServiceUpdated = async () => {
+        await fetchServices(); // Rafraîchir la liste des services après mise à jour
+        setShowUpdateForm(false); // Fermer le formulaire de mise à jour après succès
+    };
+
+    // Fonction pour ouvrir le formulaire de création
+    const openCreateForm = () => {
+        setShowForm(true);
+    };
+
+    // Fonction pour ouvrir le formulaire de mise à jour
+    const openUpdateForm = (service: Service) => {
+        setSelectedService(service); // Définir le service sélectionné pour la modification
+        setShowUpdateForm(true); // Afficher le formulaire de mise à jour
     };
 
     // Si le chargement est en cours, afficher un message de chargement
@@ -101,7 +114,7 @@ export default function ServicesManager() {
                                     </button>
                                     <button
                                         className='bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded mx-1 w-1/2'
-                                        onClick={() => openForm(service)}
+                                        onClick={() => openUpdateForm(service)}
                                     >
                                         Modifier
                                     </button>
@@ -113,15 +126,25 @@ export default function ServicesManager() {
             </div>
 
             <button
-                onClick={() => openForm(null)}
+                onClick={openCreateForm}
                 className='bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md mt-4'>
                 Ajouter un Service
             </button>
 
+            {/* Afficher le formulaire de création */}
             {showForm && (
                 <FormCreate
                     onCreateSuccess={handleServiceCreated}
                     onClose={() => setShowForm(false)}
+                />
+            )}
+
+            {/* Afficher le formulaire de mise à jour */}
+            {showUpdateForm && selectedService && (
+                <FormUpdate
+                    service={selectedService}
+                    onUpdateSuccess={handleServiceUpdated}
+                    onClose={() => setShowUpdateForm(false)}
                 />
             )}
         </main>
