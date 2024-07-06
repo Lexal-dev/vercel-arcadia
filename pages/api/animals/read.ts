@@ -23,8 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     return {
                         ...animal.toJSON(),
                         raceId: race ? race.name : 'N/A', // Remplace raceId par le nom de la race
-                        habitatId: habitat ? habitat.name : 'N/A', // Remplace habitatId par le nom de l'habitat
-                        
+                        habitatId: habitat ? habitat.name : 'N/A', // Remplace habitatId par le nom de l'habitat                
                     };
                 });
 

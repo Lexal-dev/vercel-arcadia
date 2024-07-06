@@ -1,87 +1,156 @@
-"use client";
-
-import BtnDelete from '@/components/api/animals/BtnDelete';
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+"use client"
+import React, { useState, useEffect } from 'react';
+import { MdClose } from 'react-icons/md';
+import Animal from '@/models/animal';
+import Race from '@/models/race';
+import Habitat from '@/models/habitat';
 
 interface FormUpdateProps {
-    animalId: number;
-    animalName: string;
-    animalEtat: string;
+  animal: Animal; // Animal à mettre à jour
+  onUpdateSuccess: () => void; // Callback après la mise à jour réussie
+  onClose: () => void; // Callback pour fermer le formulaire
 }
 
-export default function FormUpdate(props: FormUpdateProps) {
-    const { animalId, animalName, animalEtat } = props;
+const FormUpdate: React.FC<FormUpdateProps> = ({ animal, onUpdateSuccess, onClose }) => {
+  const [formData, setFormData] = useState({
+    name: animal.name,
+    raceId: animal.raceId.toString(),
+    habitatId: animal.habitatId.toString(),
+    etat: animal.etat // Conserver la valeur d'origine de l'état
+  });
 
-    const [name, setName] = useState(animalName);
-    const [etat, setEtat] = useState(animalEtat);
-    const [message, setMessage] = useState('');
+  const [races, setRaces] = useState<Race[]>([]);
+  const [habitats, setHabitats] = useState<Habitat[]>([]);
 
-    const router = useRouter();
-    
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const updatedName = name.trim() === '' ? animalName : name;
-        const updatedEtat = etat.trim() === '' ? animalEtat : etat;
-
-        try {
-            const res = await fetch(`/api/animals/update?id=${animalId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name: updatedName, etat: updatedEtat }),
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                setMessage(`L'animal : ${data.animal.name} a bien été modifié`);
-                setName('');
-                setEtat('');
-                router.push('/');
-            } else {
-                setMessage(data.message);
-            }
-        } catch (error) {
-            setMessage("Un problème est survenu lors de la modification de l'animal.");
+  useEffect(() => {
+    fetch('/api/animals/read')
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.success) {
+          setRaces(data.races);
+          setHabitats(data.habitats);
+        } else {
+          console.error('Failed to fetch data:', data.message);
         }
-    };
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
 
-    return (
-        <>
-            <form onSubmit={handleSubmit} className='flex flex-col w-[400px] items-center justify-around gap-4 bg-slate-300 rounded-md text-black p-6'>
-                <div className='flex flex-col gap-6'>
-                    <div className='flex justify-between w-full'>
-                        <label>Nom:</label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                            minLength={3}
-                            maxLength={50}
-                        />
-                    </div>
-                    <div className='flex justify-between w-full'>
-                        <label>État:</label>
-                        <input
-                            type="text"
-                            value={etat}
-                            onChange={(e) => setEtat(e.target.value)}
-                            required
-                            minLength={3}
-                            maxLength={100}
-                        />
-                    </div>            
-                </div>
-                <div className='flex items-center justify-around'>
-                    <button type="submit" className='bg-yellow-200 hover:bg-yellow-300 border-2 border-yellow-300 p-2 text-yellow-700'>Modifier</button>
-                    <BtnDelete animalId={animalId} animalName={animalName}/>             
-                </div>
-                {message && <p className='text-red-600'>{message}</p>}
-            </form>
-        </>
-    );
-}
+  const handleUpdateAnimal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // Vérifier si les champs requis sont remplis
+      if (!formData.name || !formData.raceId || !formData.habitatId) {
+        console.error('Le nom, raceId et habitatId sont requis.');
+        return;
+      }
+
+      const response = await fetch(`/api/animals/update?id=${animal.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          raceId: parseInt(formData.raceId, 10), // Utiliser l'ID de la race
+          habitatId: parseInt(formData.habitatId, 10), // Utiliser l'ID de l'habitat
+          etat: formData.etat // Envoyer l'état d'origine
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        onUpdateSuccess();
+      } else {
+        console.error('Erreur lors de la mise à jour de l\'animal:', data.message);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'animal:', error);
+    }
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Vérifie si la valeur a été modifiée avant de mettre à jour l'état
+    if (e.target.value !== animal.name) {
+      setFormData({ ...formData, name: e.target.value });
+    }
+  };
+
+  const handleRaceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // Mettre à jour avec l'ID de la race sélectionnée
+    if (e.target.value !== animal.raceId.toString()) {
+      setFormData({ ...formData, raceId: e.target.value });
+    }
+  };
+
+  const handleHabitatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // Mettre à jour avec l'ID de l'habitat sélectionné
+    if (e.target.value !== animal.habitatId.toString()) {
+      setFormData({ ...formData, habitatId: e.target.value });
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded shadow-md w-1/3">
+        <button onClick={onClose} className="w-full flex justify-end text-red-500 hover:text-red-700">
+          <MdClose size={36} />
+        </button>
+        <form onSubmit={handleUpdateAnimal} className="text-black">
+          <div className="mb-4">
+            <label className="block text-gray-700">Nom</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={handleNameChange}
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Race</label>
+            <select
+              value={formData.raceId}
+              onChange={handleRaceChange}
+              className="w-full p-2 border rounded"
+              required
+            >
+              <option value="">Sélectionnez une race</option>
+              {races.map(race => (
+                <option key={race.id} value={race.id.toString()}>
+                  {race.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Habitat</label>
+            <select
+              value={formData.habitatId}
+              onChange={handleHabitatChange}
+              className="w-full p-2 border rounded"
+              required
+            >
+              <option value="">Sélectionnez un habitat</option>
+              {habitats.map(habitat => (
+                <option key={habitat.id} value={habitat.id.toString()}>
+                  {habitat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Champ caché pour maintenir l'état d'origine */}
+          <input type="hidden" name="etat" defaultValue={animal.etat} />
+          <button
+            type="submit"
+            className="w-full bg-yellow-500 hover:bg-yellow-600 border border-yellow-600 hover:border-yellow-700 text-white py-2 px-4 rounded"
+          >
+            Mettre à Jour
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default FormUpdate;
