@@ -2,17 +2,17 @@ import { DataTypes, Model } from 'sequelize';
 import sequelizeInstance from '@/lib/sequelize';
 
 interface UserAttributes {
-    id: number;
+    id?: number; // Rendre id optionnel
     email: string;
     password: string;
-    role: string; // Ajoutez la propriété role ici
+    role: string;
 }
 
 class User extends Model<UserAttributes> implements UserAttributes {
     public id!: number;
     public email!: string;
     public password!: string;
-    public role!: string; // Déclarez la propriété role ici
+    public role!: string;
 }
 
 User.init(
