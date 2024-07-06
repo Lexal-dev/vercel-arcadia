@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelizeInstance from '@/lib/sequelize';
 
-interface HabitatAttributes {
+export interface HabitatAttributes {
     id: number;
     name: string;
     description: string;
