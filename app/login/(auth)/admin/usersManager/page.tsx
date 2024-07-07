@@ -1,65 +1,76 @@
 "use client"
-import FormCreate from '@/components/api/services/FormCreate';
-import Service from '@/models/service';
 import React, { useEffect, useState } from 'react';
+import FormCreate from '@/components/api/users/FormCreate';
+import FormUpdate from '@/components/api/users/FormUpdate'; // Assurez-vous que le chemin vers FormUpdate est correct
+import User from '@/models/user';
 
-export default function ServicesManager() {
-    const [services, setServices] = useState<Service[]>([]);
+export default function UsersManager() {
+    const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [showForm, setShowForm] = useState<boolean>(false); // État pour contrôler l'affichage de la modal
-    const [selectedService, setSelectedService] = useState<Service | null>(null); // État pour stocker le service sélectionné pour la modification
+    const [showForm, setShowForm] = useState<boolean>(false); // État pour contrôler l'affichage de la modal de création
+    const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false); // État pour contrôler l'affichage du formulaire de mise à jour
+    const [selectedUser, setSelectedUser] = useState<User | null>(null); // État pour stocker le user sélectionné pour la modification
 
-    // Fonction pour récupérer les services depuis l'API
-    const fetchServices = async () => {
+    const fetchUsers = async () => {
         try {
-            const response = await fetch('/api/services/read');
+            const response = await fetch('/api/users/read');
             const data = await response.json();
             if (data.success) {
-                setServices(data.services);
+                setUsers(data.users);
             } else {
-                setError(data.message || 'Failed to fetch services');
+                setError(data.message || 'Failed to fetch users');
             }
         } catch (error) {
-            console.error('Error fetching services:', error);
-            setError('An error occurred while fetching services');
+            console.error('Error fetching users:', error);
+            setError('An error occurred while fetching users');
         } finally {
             setLoading(false);
         }
     };
 
-    // Appeler fetchServices une seule fois au chargement du composant
     useEffect(() => {
-        fetchServices();
+        fetchUsers();
     }, []);
 
-    // Fonction pour supprimer un service
-    const handleDeleteService = async (id: number) => {
+    // Fonction pour supprimer un user
+    const handleUserDelete = async (id: number) => {
         try {
-            const response = await fetch(`/api/services/delete?id=${id}`, {
+            const response = await fetch(`/api/users/delete?id=${id}`, {
                 method: 'DELETE',
             });
             const data = await response.json();
             if (data.success) {
-                setServices(services.filter(service => service.id !== id));
+                setUsers(users.filter(user => user.id !== id));
             } else {
-                console.error('Error deleting service:', data.message);
+                console.error('Error deleting users:', data.message);
             }
         } catch (error) {
-            console.error('Error deleting service:', error);
+            console.error('Error deleting users:', error);
         }
     };
 
-    // Fonction pour gérer la réussite de la création d'un service
-    const handleServiceCreated = async () => {
-        await fetchServices(); // Rafraîchir la liste des services après création
+    // Fonction pour gérer la réussite de la création d'un user
+    const handleUsersCreated = async () => {
+        await fetchUsers(); // Rafraîchir la liste des users après création
         setShowForm(false); // Fermer la modal après création
     };
 
-    // Fonction pour ouvrir la modal de création ou de mise à jour d'un service
-    const openForm = (service: Service | null = null) => {
-        setSelectedService(service); // Définir le service sélectionné pour la modification, ou null pour la création
-        setShowForm(true); // Afficher la modal
+    // Fonction pour gérer la réussite de la mise à jour d'un user
+    const handleUsersUpdated = async () => {
+        await fetchUsers(); // Rafraîchir la liste des users après mise à jour
+        setShowUpdateForm(false); // Fermer le formulaire de mise à jour après succès
+    };
+
+    // Fonction pour ouvrir le formulaire de création
+    const openCreateForm = () => {
+        setShowForm(true);
+    };
+
+    // Fonction pour ouvrir le formulaire de mise à jour
+    const openUpdateForm = (user: User) => {
+        setSelectedUser(user); // Définir le user sélectionné pour la modification
+        setShowUpdateForm(true); // Afficher le formulaire de mise à jour
     };
 
     // Si le chargement est en cours, afficher un message de chargement
@@ -75,7 +86,7 @@ export default function ServicesManager() {
     // Rendu du composant principal
     return (
         <main className='flex flex-col items-center p-12'>
-            <h1 className='text-2xl mb-4 font-bold'>Service Management</h1>
+            <h1 className='text-2xl mb-4 font-bold'>Users Management</h1>
             <div className="overflow-x-auto w-full max-w-4xl">
                 <table className='min-w-full bg-white text-black shadow-md rounded-lg'>
                     <thead className='bg-gray-200'>
@@ -87,21 +98,21 @@ export default function ServicesManager() {
                         </tr>
                     </thead>
                     <tbody>
-                        {services.map((service) => (
-                            <tr key={service.id} className='even:bg-gray-100'>
-                                <td className='py-3 px-6 border-b'>{service.id}</td>
-                                <td className='py-3 px-6 border-b'>{service.name}</td>
-                                <td className='py-3 px-6 border-b'>{service.description}</td>
+                        {users.map((user) => (
+                            <tr key={user.id} className='even:bg-gray-100'>
+                                <td className='py-3 px-6 border-b'>{user.id}</td>
+                                <td className='py-3 px-6 border-b'>{user.email}</td>
+                                <td className='py-3 px-6 border-b'>{user.role}</td>
                                 <td className='py-3 px-6 border-b text-center flex justify-center'>
                                     <button
                                         className='bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded mx-1 w-1/2'
-                                        onClick={() => handleDeleteService(service.id)}
+                                        onClick={() => handleUserDelete(user.id)}
                                     >
                                         Supprimer
                                     </button>
                                     <button
                                         className='bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded mx-1 w-1/2'
-                                        onClick={() => openForm(service)}
+                                        onClick={() => openUpdateForm(user)}
                                     >
                                         Modifier
                                     </button>
@@ -113,15 +124,25 @@ export default function ServicesManager() {
             </div>
 
             <button
-                onClick={() => openForm(null)}
+                onClick={openCreateForm}
                 className='bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md mt-4'>
-                Ajouter un Service
+                Ajouter un utilisateur
             </button>
 
+            {/* Afficher le formulaire de création */}
             {showForm && (
                 <FormCreate
-                    onCreateSuccess={handleServiceCreated}
+                    onCreateSuccess={handleUsersCreated}
                     onClose={() => setShowForm(false)}
+                />
+            )}
+
+            {/* Afficher le formulaire de mise à jour */}
+            {showUpdateForm && selectedUser && (
+                <FormUpdate
+                    user={selectedUser}
+                    onUpdateSuccess={handleUsersUpdated}
+                    onClose={() => setShowUpdateForm(false)}
                 />
             )}
         </main>
