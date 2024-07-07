@@ -9,12 +9,11 @@ interface UpdateBody {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'PUT') {
-    const { id } = req.query as { id: string }; // Assurez-vous que id est de type string
-    const { name, description, comment } = req.body as UpdateBody; // Assurez-vous que req.body est de type UpdateBody
+    const { id } = req.query as { id: string };
+    const { name, description, comment } = req.body as UpdateBody;
 
     try {
-      // Vérifier si l'habitat existe
-      const habitat = await Habitat.findByPk(id);
+      const habitat = await Habitat.findByPk(Number(id));
 
       if (!habitat) {
         return res.status(404).json({ success: false, message: 'Habitat non trouvé.' });

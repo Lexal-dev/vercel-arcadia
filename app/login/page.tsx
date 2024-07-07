@@ -1,6 +1,6 @@
 
 "use client"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
@@ -8,6 +8,14 @@ const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if(storedUser){
+            router.push("/login/auth");
+            console.log("Déjà connecté")
+        }
+      }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

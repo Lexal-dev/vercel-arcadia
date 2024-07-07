@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       user.email = email;
       user.role = role;
 
-      // Si un nouveau mot de passe est fourni, le mettre à jour et le hasher
+      
       if (password) {
         await user.setPassword(password); // Utilisez la méthode setPassword du modèle User pour hacher le mot de passe
       }
