@@ -1,4 +1,4 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import sequelizeInstance from '@/lib/sequelize';
 import Animal from './animal'; // Importer le modèle Animal
 
@@ -10,7 +10,10 @@ interface ReportAttributes {
     animalId: number;
 }
 
-class Report extends Model<ReportAttributes> implements ReportAttributes {
+
+interface ReportCreationAttributes extends Optional<ReportAttributes, 'id'> {}
+
+class Report extends Model<ReportAttributes, ReportCreationAttributes> implements ReportAttributes {
     public id!: number;
     public food!: string;
     public quantity!: number;
