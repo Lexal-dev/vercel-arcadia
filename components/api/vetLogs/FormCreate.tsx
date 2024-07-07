@@ -39,7 +39,7 @@ const FormCreate: React.FC<FormCreateProps> = ({ animalId, onCreate }) => {
   return (
     <form onSubmit={handleSubmit} className="mt-4">
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-700">État de l'animal</label>
+        <label className="block text-sm font-medium text-gray-700">État de l&apos;animal</label>
         <input
           type="text"
           value={animalState}

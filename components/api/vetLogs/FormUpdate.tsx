@@ -54,7 +54,7 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ vetLogId, vetLog }) => {
       <div className="bg-white p-6">
         <form onSubmit={handleUpdateVetLog} className="text-black">
           <div className="mb-4">
-            <label className="block text-gray-700">État de l'animal</label>
+            <label className="block text-gray-700">État de l&apos;animal</label>
             <input
               type="text"
               value={formData.animalState}
