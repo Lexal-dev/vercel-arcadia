@@ -75,7 +75,7 @@ export default function ListAnimals() {
   }, [selectedHabitatName])
   return (
     <>
-      
+      <h3 className='w-full text-3xl font-bold text-start mb-4'>Consultations</h3>
       <select onChange={handleHabitatChange} className='text-black p-1 rounded-md bg-slate-300 mb-6'>
         <option value="">Sélectionnez un habitat</option>
         {habitats.map(habitat => (
@@ -84,7 +84,7 @@ export default function ListAnimals() {
           </option>
         ))}
       </select>
-      <div className='w-full'>
+      <div className='w-full flex flex-col items-center'>
         <div className='flex items-center items-center gap-3'>
           <h2 className='text-2xl font-bold mb-4'>liste des animaux </h2> 
           {choiceHabitat ? (<p className='text-xl font-bold mb-4'> [Complète]:</p>) : (<p className='text-xl font-bold mb-4'> [{selectedHabitatName}]:</p>)}                   
