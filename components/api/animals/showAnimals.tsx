@@ -1,5 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
+import { collection, getDocs, doc, updateDoc, increment, setDoc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebaseConfig';
 import Animal from '@/models/animal';
 import Habitat from '@/models/habitat';
 
@@ -29,16 +31,42 @@ export default function ShowAnimals() {
     setSelectedHabitatName(habitatName !== "" ? habitatName : null);
   };
 
-  const handleAnimalId = (animalId: number) => {
+  const handleAnimalId = async (animalId: number) => {
     const selected = animals.find(animal => animal.id === animalId);
     if (selected) {
       setSelectedAnimal(selected);
       setModal(true);
+      await addOrUpdateConsultation(selected);
     }
   };
+
+  const addOrUpdateConsultation = async (animal: Animal) => {
+    const animalDocRef = doc(db, 'animals', animal.id.toString());
+
+    try {
+      const animalDocSnapshot = await getDoc(animalDocRef);
+
+      if (animalDocSnapshot.exists()) {
+        // L'animal existe, incrémenter le nombre de consultations
+        await updateDoc(animalDocRef, {
+          consultations: increment(1)
+        });
+      } else {
+        // L'animal n'existe pas, créer un nouveau document avec consultations à 1
+        await setDoc(animalDocRef, {
+          animalName: animal.name,
+          consultations: 1
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour ou de l\'ajout de la consultation :', error);
+    }
+  };
+
   const filteredAnimals = selectedHabitatName
     ? animals.filter(animal => animal.habitatId.toString() === selectedHabitatName)
     : animals;
+
   return (
     <>
       <select onChange={handleHabitatChange} className='text-black p-1 rounded-md bg-slate-300 mb-6'>
