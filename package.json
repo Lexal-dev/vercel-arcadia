@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@firebase/firestore": "^4.6.4",
     "@neondatabase/serverless": "^0.9.4",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.5",
+    "firebase": "^10.12.3",
     "googleapis": "^140.0.1",
     "lucide-react": "^0.400.0",
     "mysql2": "^3.10.2",
