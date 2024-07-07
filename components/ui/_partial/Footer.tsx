@@ -1,0 +1,51 @@
+"use client"
+import React, { useEffect, useState } from 'react';
+import Hours from '@/models/hour';
+
+export default function Footer() {
+    const [hours, setHours] = useState<Hours[]>([]);
+
+    useEffect(() => {
+        fetch('/api/hours/read', {
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    setHours(data.hours);
+                } else {
+                    console.error('Failed to fetch hours:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching hours:', error);
+            });
+    }, []);
+
+    return (
+        <footer className="flex flex-col items-center gap-3 p-3 w-full bg-gray-800 text-white bottom-0">
+            <div className="overflow-x-auto w-full">
+                <h2 className='text-xl font-bold text-center mb-4'>Nos horraires:</h2>
+                <table className="min-w-full bwhiteg- border-gray-200 shadow-md roundeds">
+                    <thead>
+                        <tr className="border">
+                            <th className="py-2 px-4 border-r">Jours</th>
+                            <th className="py-2 px-4 border-r">Ouverture</th>
+                            <th className="py-2 px-4">Fermeture</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {hours.map(hour => (
+                            <tr key={hour.id} className="border-b hover:bg-gray-100 text-center border-x">
+                                <td className="py-2 px-4 border-r">{hour.days}</td>
+                                <td className="py-2 px-4 border-r">{hour.open}</td>
+                                <td className="py-2 px-4">{hour.close}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="w-full text-center border-t pt-3">Copyright © 2024. ARCADIA Tous droits réservés</div>
+        </footer>
+    );
+}
