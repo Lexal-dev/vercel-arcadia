@@ -194,7 +194,7 @@ const Test: React.FC = () => {
                                         </li>
                                     ))}
                                     {!selectedHabitat.imageUrl && (
-                                        <li>Aucune URL d'image disponible</li>
+                                        <li>Aucune URL d&apos;image disponible</li>
                                     )}
                                 </ul>
                             </div>
@@ -214,7 +214,7 @@ const Test: React.FC = () => {
                                         </li>
                                     ))}
                                     {!selectedHabitat.imageUrl && (
-                                        <li>Aucune URL d'image disponible</li>
+                                        <li>Aucune URL d&apos;image disponible</li>
                                     )}
                                 </ul>
                             </div>
