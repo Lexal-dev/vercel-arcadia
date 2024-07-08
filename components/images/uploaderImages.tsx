@@ -1,7 +1,6 @@
-"use client"
 import React, { useEffect, useState } from 'react';
 import { storage } from '@/lib/firebaseConfig';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, getMetadata } from 'firebase/storage';
 
 interface ImageUploaderProps {
     folderName: string;
@@ -18,6 +17,21 @@ export interface Habitat {
     imageUrl: string[];
 }
 
+const checkFileExistsInStorage = async (imageFileName: string, folderName: string): Promise<boolean> => {
+    const storageRef = ref(storage);
+    const fileRef = ref(storageRef, `images/${folderName}/${imageFileName}`);
+    try {
+        await getMetadata(fileRef);
+        return true; // File exists
+    } catch (error:any) {
+        if (error.code === 'storage/object-not-found') {
+            return false; // File does not exist
+        }
+        console.error('Error checking if file exists in storage:', error);
+        throw error; // Rethrow other errors
+    }
+};
+
 const ImageUploader: React.FC<ImageUploaderProps> = ({ folderName, selectedHabitat, onClose, onUpdate }) => {
     const [uploading, setUploading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -32,7 +46,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ folderName, selectedHabit
         const currentFile = e.target.files?.[0];
         if (currentFile) {
             setFile(currentFile);
-            console.log(currentFile);
         }
     };
 
@@ -42,10 +55,19 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ folderName, selectedHabit
 
         try {
             setUploading(true);
+
+            // Check if the file exists in storage before attempting to upload
+            const fileExists = await checkFileExistsInStorage(imageFile.name, folderName);
+            if (fileExists) {
+                setError('Image already exists in storage.');
+                return null;
+            }
+
+            // Proceed with uploading the image if it doesn't already exist
             const snapshot = await uploadBytes(fileRef, imageFile);
             const url = await getDownloadURL(snapshot.ref);
             console.log('Image uploaded successfully:', url);
-            return url; 
+            return url;
         } catch (error) {
             console.error('Error uploading image:', error);
             setError('Failed to upload image');
@@ -73,13 +95,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ folderName, selectedHabit
 
                     const data = await response.json();
                     if (data.message) {
-                        const updatedHabitat = { ...currentHabitat, imageUrl: updatedImageUrlList };
-                        setCurrentHabitat(updatedHabitat);
+                        setCurrentHabitat({ ...currentHabitat, imageUrl: updatedImageUrlList });
                         setFile(null);
                         setError(null);
                         console.log('Image URL updated successfully');
-                        onUpdate(updatedHabitat);
-                        onClose();
+                        onUpdate({ ...currentHabitat, imageUrl: updatedImageUrlList }); // Update parent state
+                        onClose(); // Close modal or handle closing logic
                     } else {
                         setError(data.error || 'Failed to update imageUrl');
                     }

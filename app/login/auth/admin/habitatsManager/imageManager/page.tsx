@@ -4,7 +4,7 @@ import ImageUploader from '@/components/images/uploaderImages';
 import Image from 'next/image';
 import { storage } from '@/lib/firebaseConfig';
 import { ref, deleteObject } from 'firebase/storage';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Utilisation de useRouter au lieu de next/navigation
 
 interface Habitat {
     id: number;
@@ -14,7 +14,7 @@ interface Habitat {
     imageUrl: string[];
 }
 
-const Test: React.FC = () => {
+export default function ImageManager(){
     const [habitats, setHabitats] = useState<Habitat[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -118,7 +118,7 @@ const Test: React.FC = () => {
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedHabitat(null);
-        router.push("/test");
+        router.push("/login/auth/admin/habitatsManager/imageManager");
     };
 
     const handleHabitatUpdate = (updatedHabitat: Habitat) => {
@@ -178,50 +178,39 @@ const Test: React.FC = () => {
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                     <div className="flex flex-col justify-between modal-content min-w-[1000px] min-h-[500px] bg-white text-black p-8 rounded-lg shadow-lg">
                         <div className='flex justify-between items-center mb-4'>
-                            <h2 className="w-full text-4xl font-bold text-center">URL -&gt; {selectedHabitat.name}</h2>
+                            <h2 className="w-full text-4xl font-bold text-center">URL/IMAGES -&gt; {selectedHabitat.name}</h2>
                             <span className="cursor-pointer text-4xl hover:text-red-500" onClick={closeModal}>&times;</span>
                         </div>
-                        <div className='flex'>
-                            <div className='flex flex-col w-1/2 w-full items-center'>
-                                <h3 className="font-bold mb-2">URL existant -&gt;</h3>
-                                <ul className="list-disc pl-4">
-                                    {selectedHabitat.imageUrl && selectedHabitat.imageUrl.map((url, index) => (
-                                        <li key={index}>
-                                            {url}
-                                            <button onClick={() => deleteImageUrl(selectedHabitat.id, index, url)} className="ml-2 text-red-500 hover:text-red-700">
-                                                Supprimer
-                                            </button>
-                                        </li>
-                                    ))}
-                                    {!selectedHabitat.imageUrl && (
-                                        <li>Aucune URL d&apos;image disponible</li>
-                                    )}
-                                </ul>
-                            </div>
-
-                            <div className='flex flex-col w-1/2 w-full items-center'>
-                                <h3 className="font-bold mb-2">Image(s) -&gt;</h3>
-                                <ul className='flex flex-wrap max-w-[405px]'>
-                                    {selectedHabitat.imageUrl && selectedHabitat.imageUrl.map((url, index) => (
-                                        <li key={index} className='w-1/2 w-[200px] p-2' onClick={() => handleImageClick(url)}>
-                                            {isValidUrl(url) ? (
-                                                <Image src={url} width={200} height={200} alt={`${selectedHabitat.name}${index}`} />
-                                            ) : (
-                                                <div className="flex items-center justify-center w-full h-full bg-gray-200 rounded">
-                                                    Image not available
+                       
+                        <div className='flex flex-col w-full items-around'>
+                            <ul className='flex flex-wrap items-start justify-start'>
+                                {selectedHabitat.imageUrl && selectedHabitat.imageUrl.map((url, index) => (
+                                    <li key={index} className=' p-2' onClick={() => handleImageClick(url)}>
+                                        {isValidUrl(url) ? (
+                                            <div className='w-full flex gap-3'>
+                                                <Image src={url} width={200}  height={200} alt={`Image ${index}`} />
+                                                <div className='flex flex-col justify-between items-start'>
+                                                    <small>{url}</small>
+                                                    <button onClick={() => deleteImageUrl(selectedHabitat.id, index, url)} className="ml-2 text-red-500 hover:text-red-700">
+                                                        Supprimer
+                                                    </button>
                                                 </div>
-                                            )}
-                                        </li>
-                                    ))}
-                                    {!selectedHabitat.imageUrl && (
-                                        <li>Aucune URL d&apos;image disponible</li>
-                                    )}
-                                </ul>
-                            </div>
+                                                
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center w-full h-full bg-gray-200 rounded">
+                                                Image not available
+                                            </div>
+                                        )}
+                                    </li>
+                                ))}
+                                {!selectedHabitat.imageUrl && (
+                                    <li>Aucune URL d&apos;image disponible</li>
+                                )}
+                            </ul>
                         </div>
-
+                      
                         <div className='flex flex-col items-center'>
-                            <h3>{selectedHabitat.name} : {selectedHabitat.id}</h3>
                             <ImageUploader
                                 folderName="habitats"
                                 selectedHabitat={selectedHabitat}
@@ -235,5 +224,3 @@ const Test: React.FC = () => {
         </main>
     );
 }
-
-export default Test;
