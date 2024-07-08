@@ -6,15 +6,19 @@ export interface HabitatAttributes {
     name: string;
     description: string;
     comment: string;
+    imageUrl?: string[] | null; // Définir comme un tableau de chaînes de caractères ou null
 }
 
-interface HabitatCreationAttributes extends Optional<HabitatAttributes, 'id'> {}
+interface HabitatCreationAttributes extends Optional<HabitatAttributes, 'id'> {
+    imageUrl?: string[] | null; // Ajuster la définition pour accepter null
+}
 
 class Habitat extends Model<HabitatAttributes, HabitatCreationAttributes> implements HabitatAttributes {
     public id!: number;
     public name!: string;
     public description!: string;
     public comment!: string;
+    public imageUrl!: string[] | null; 
 }
 
 Habitat.init(
@@ -54,6 +58,10 @@ Habitat.init(
                     msg: "Le commentaire doit être compris entre 3 et 100 caractères",
                 },
             },
+        },
+        imageUrl: {
+            type: DataTypes.ARRAY(DataTypes.STRING),
+            allowNull: true,
         },
     },
     {
