@@ -11,8 +11,8 @@ if (!JWT_SECRET) {
 }
 
 // Fonction pour générer un token JWT
-const generateToken = (userId: string) => {
-    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '1h' }); // Vous pouvez ajuster l'expiration selon vos besoins
+const generateToken = (userId: string, userRole: string, userEmail:string) => {
+    return jwt.sign({ userId, userRole, userEmail }, JWT_SECRET, { expiresIn: '1h' });
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -34,11 +34,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 return res.status(401).json({ success: false, message: 'Adresse email ou mot de passe incorrect.' });
             }
 
-            // Générer un token JWT valide
+            // Générer un token JWT valide avec userId et userRole
             const userIdAsString = user.id.toString();
-            const token = generateToken(userIdAsString);
+            const token = generateToken(userIdAsString, user.role, user.email);
 
-            // Vous pouvez ajouter d'autres informations utilisateur à la réponse si nécessaire
+            // Préparer les données utilisateur à retourner dans la réponse
             const userData = {
                 id: user.id,
                 email: user.email,
@@ -52,6 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return res.status(500).json({ success: false, message: 'Erreur serveur. Veuillez réessayer plus tard.', error: String(error) });
         }
     } else {
+        // Si la méthode HTTP n'est pas autorisée (autre que POST)
         res.setHeader('Allow', ['POST']);
         return res.status(405).end(`Méthode ${req.method} non autorisée`);
     }

@@ -1,6 +1,5 @@
-
-"use client"
-import { useState, useEffect } from 'react';
+"use client";
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
@@ -9,18 +8,9 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if(storedUser){
-            router.push("/login/auth");
-            console.log("Déjà connecté")
-        }
-      }, []);
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-       
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -35,12 +25,12 @@ const LoginPage = () => {
                 throw new Error(message || 'Erreur lors de la connexion.');
             }
 
-            const { user } = await response.json();
+            const { token } = await response.json();
 
-            // Enregistrer l'utilisateur dans le localStorage
-            localStorage.setItem('user', JSON.stringify(user));
+            // Enregistrer le token dans le localStorage
+            localStorage.setItem('token', token);
 
-            // Rediriger vers une autre page (par exemple, le dashboard)
+          
             router.push('/login/auth');
         } catch (error:any) {
             setError(error.message || 'Erreur lors de la connexion.');

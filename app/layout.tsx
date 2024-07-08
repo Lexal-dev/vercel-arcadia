@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/ui/_partial/Header";
 import Footer from "@/components/ui/_partial/Footer";
-
+import {UserProvider} from "@/context/UserContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,11 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <UserProvider>
           <Header />
             <div className="min-h-screen bg-slate-700 text-white pt-[450px]">
               {children}           
             </div>
           <Footer />
+        </UserProvider>
       </body>
     </html>
   );

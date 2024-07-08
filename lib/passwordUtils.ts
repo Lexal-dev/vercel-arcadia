@@ -19,3 +19,5 @@ export const comparePasswords = async (password: string, hashedPassword: string)
     throw new Error('Error comparing passwords');
   }
 };
+
+
