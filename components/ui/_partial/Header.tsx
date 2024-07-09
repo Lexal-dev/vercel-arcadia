@@ -40,7 +40,7 @@ export default function Header() {
 
   return (
     <header
-      className="absolute flex flex-col items-center h-[450px] w-full border-b-4 border-green-100"
+      className="absolute flex flex-col items-center h-[250px] w-full border-b-4 border-green-100"
       style={headerStyle}
     >
       <nav className="flex justify-between items-center w-full md:w-3/4 py-4 px-1 text-lg md:text-xl text-white mb-12">

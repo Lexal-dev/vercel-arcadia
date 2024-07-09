@@ -1,10 +1,11 @@
 "use client"
 import React, { useState } from 'react';
+import NekoToast from '@/components/ui/_partial/Toast'; // Assurez-vous que le chemin est correct
 
 export default function FormCreate() {
     const [pseudo, setPseudo] = useState('');
     const [comment, setComment] = useState('');
-    const [message, setMessage] = useState('');
+    const [toast, setToast] = useState<{ type: 'Success' | 'Error', message: string } | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -21,21 +22,25 @@ export default function FormCreate() {
             const data = await res.json();
 
             if (res.ok) {
-                setMessage('Avis créé avec succès.');
+                setToast({ type: 'Success', message: 'Avis créé avec succès.' });
                 setPseudo('');
                 setComment('');
             } else {
-                setMessage(data.message || 'Une erreur est survenue lors de la création de l\'avis.');
+                setToast({ type: 'Error', message: data.message || 'Une erreur est survenue lors de la création de l\'avis.' });
             }
         } catch (error) {
             console.error('Erreur lors de la création de l\'avis:', error);
-            setMessage('Un problème est survenu lors de la création de l\'avis.');
+            setToast({ type: 'Error', message: 'Un problème est survenu lors de la création de l\'avis.' });
         }
+
+        setTimeout(() => setToast(null), 3000);
     };
 
     return (
         <>
-            <form onSubmit={handleSubmit} className='flex flex-col min-w-[300px] border-2 border-slate-300 rounded-md p-6 gap-6'>
+            {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} />}
+            <h1 className='font-bold text-4xl text-center'>Votre avis</h1>
+            <form onSubmit={handleSubmit} className='flex flex-col min-w-[300px] border-2 border-slate-300 rounded-md p-6 gap-6 bg-muted'>
                 <div className='flex flex-col gap-6'>
                     <div className='flex gap-3 justify-between items-center'>
                         <label>Pseudo:</label>
@@ -46,7 +51,7 @@ export default function FormCreate() {
                             required
                             minLength={3}
                             maxLength={30}
-                            className='w-2/3 p-2 rounded-md text-black'
+                            className='w-2/3 p-2 rounded-md bg-background hover:bg-muted-foreground'
                         />
                     </div>
                     <div className='flex gap-3 justify-between items-center'>
@@ -57,13 +62,12 @@ export default function FormCreate() {
                             required
                             minLength={3}
                             maxLength={150}
-                            className='w-2/3 p-2 rounded-md text-black'
+                            className='w-2/3 p-2 rounded-md bg-background hover:bg-muted-foreground'
                         />
                     </div>
                 </div>
 
                 <button type="submit" className='bg-green-200 hover:bg-green-300 border-2 border-green-300 p-2 text-green-700'>Ajouter un avis</button>
-                {message && <p className='text-green-600'>{message}</p>}        
             </form>
         </>
     );

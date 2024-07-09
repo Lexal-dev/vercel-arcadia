@@ -5,16 +5,18 @@ import { ValidationError } from 'sequelize';
 export default async function createAvis(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         try {
-            await Avis.sync({ alter: true }); // Synchronisation du modèle avec la base de données si nécessaire
-
             const { pseudo, comment } = req.body;
 
-            if (!pseudo || !comment) {
-                res.status(400).json({ success: false, message: 'Le pseudo et le commentaire sont requis.' });
+            if (!pseudo || pseudo.length < 3 || pseudo.length > 30) {
+                res.status(400).json({ success: false, message: 'Le pseudo doit être compris entre 3 et 30 caractères.' });
                 return;
             }
 
-            // Création d'une nouvelle instance d'Avis en spécifiant les propriétés requises
+            if (!comment || comment.length < 3 || comment.length > 150) {
+                res.status(400).json({ success: false, message: 'Le commentaire doit être compris entre 3 et 150 caractères.' });
+                return;
+            }
+
             const newAvis = await Avis.create({ pseudo, comment, isValid: false } as AvisAttributes);
 
             res.status(200).json({ success: true, message: 'Avis créé avec succès.', avis: newAvis });
@@ -32,3 +34,13 @@ export default async function createAvis(req: NextApiRequest, res: NextApiRespon
         res.status(405).end(`Méthode ${req.method} non autorisée.`);
     }
 }
+
+
+(async () => {
+    try {
+        await Avis.sync({ alter: true }); // Synchronisation du modèle avec la base de données
+        console.log('Avis table synchronized successfully');
+    } catch (error) {
+        console.error('Failed to synchronize Avis table:', error);
+    }
+})();

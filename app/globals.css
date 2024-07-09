@@ -4,51 +4,50 @@
 
   @layer base {
     :root {
-      --background: 146 40% 98%;
-      --foreground: 146 53% 2%;
-      --muted: 116 32% 90%;
-      --muted-foreground: 116 7% 37%;
-      --popover: 146 40% 98%;
-      --popover-foreground: 146 53% 2%;
-      --card: 146 40% 98%;
-      --card-foreground: 146 53% 2%;
-      --border: 146 3% 93%;
-      --input: 146 3% 93%;
-      --primary: 146 52% 40%;
-      --primary-foreground: 0 0% 100%;
-      --secondary: 116 52% 40%;
-      --secondary-foreground: 0 0% 100%;
-      --accent: 176 52% 40%;
-      --accent-foreground: 0 0% 100%;
-      --destructive: 22 92% 28%;
-      --destructive-foreground: 22 92% 88%;
-      --ring: 146 52% 40%;
-      --radius: 0.5rem;
+      --background: 95 30% 40%; /* Vert écologique plus foncé */
+      --foreground: 95 20% 90%; /* Texte clair sur fond vert */
+      --muted: 95 30% 60%; /* Vert légèrement plus clair pour éléments moins importants */
+      --muted-foreground: 95 30% 20%; /* Texte légèrement plus foncé sur fond muted */
+      --popover: 95 30% 45%; /* Un peu plus clair que le background pour popovers */
+      --popover-foreground: 95 20% 90%; /* Texte clair sur popover */
+      --card: 95 30% 45%; /* Un peu plus clair que le background pour les cartes */
+      --card-foreground: 95 20% 90%; /* Texte clair sur cartes */
+      --border: 95 30% 35%; /* Légèrement plus foncé que le background pour les bordures */
+      --input: 95 30% 45%; /* Un peu plus clair que le background pour les champs de saisie */
+      --primary: 45 100% 50%; /* Jaune pour les éléments primaires, complémentaire du vert */
+      --primary-foreground: 0 0% 0%; /* Texte noir sur éléments primaires */
+      --secondary: 210 50% 40%; /* Bleu pour les éléments secondaires */
+      --secondary-foreground: 0 0% 100%; /* Texte blanc sur éléments secondaires */
+      --accent: 120 100% 25%; /* Vert accentué pour des éléments accrocheurs */
+      --accent-foreground: 0 0% 100%; /* Texte blanc sur éléments accent */
+      --destructive: 0 70% 40%; /* Rouge pour les actions destructives */
+      --destructive-foreground: 0 0% 100%; /* Texte blanc sur éléments destructifs */
+      --ring: 95 30% 45%; /* Couleur des anneaux */
+      --radius: 0.5rem; /* Rayon des bordures arrondies */
     }
   
     .dark {
-      --background: 146 47% 2%;
-      --foreground: 146 15% 98%;
-      --muted: 116 32% 10%;
-      --muted-foreground: 116 7% 63%;
-      --popover: 146 47% 2%;
-      --popover-foreground: 146 15% 98%;
-      --card: 146 47% 2%;
-      --card-foreground: 146 15% 98%;
-      --border: 146 3% 12%;
-      --input: 146 3% 12%;
-      --primary: 146 52% 40%;
-      --primary-foreground: 0 0% 100%;
-      --secondary: 116 52% 40%;
-      --secondary-foreground: 0 0% 100%;
-      --accent: 176 52% 40%;
-      --accent-foreground: 0 0% 100%;
-      --destructive: 22 92% 54%;
-      --destructive-foreground: 0 0% 0%;
-      --ring: 146 52% 40%;
+      --background: 139 25% 27%
+      --foreground: 95 20% 90%; /* Texte clair sur fond vert foncé */
+      --muted: 95 30% 25%; /* Vert légèrement plus clair pour éléments moins importants en mode sombre */
+      --muted-foreground: 95 20% 60%; /* Texte clair sur muted en mode sombre */
+      --popover: 95 30% 25%; /* Un peu plus clair que le background pour popovers en mode sombre */
+      --popover-foreground: 95 20% 90%; /* Texte clair sur popover en mode sombre */
+      --card: 95 30% 25%; /* Un peu plus clair que le background pour les cartes en mode sombre */
+      --card-foreground: 95 20% 90%; /* Texte clair sur cartes en mode sombre */
+      --border: 95 30% 15%; /* Légèrement plus foncé que le background pour les bordures en mode sombre */
+      --input: 95 30% 25%; /* Un peu plus clair que le background pour les champs de saisie en mode sombre */
+      --primary: 45 100% 50%; /* Jaune pour les éléments primaires en mode sombre */
+      --primary-foreground: 0 0% 0%; /* Texte noir sur éléments primaires en mode sombre */
+      --secondary: 210 50% 40%; /* Bleu pour les éléments secondaires en mode sombre */
+      --secondary-foreground: 0 0% 100%; /* Texte blanc sur éléments secondaires en mode sombre */
+      --accent: 120 100% 25%; /* Vert accentué pour des éléments accrocheurs en mode sombre */
+      --accent-foreground: 0 0% 100%; /* Texte blanc sur éléments accent en mode sombre */
+      --destructive: 0 70% 40%; /* Rouge pour les actions destructives en mode sombre */
+      --destructive-foreground: 0 0% 100%; /* Texte blanc sur éléments destructifs en mode sombre */
+      --ring: 95 30% 25%; /* Couleur des anneaux en mode sombre */
     }
   }
-
   @layer base {
     * {
       @apply border-border;
@@ -56,4 +55,8 @@
     body {
       @apply bg-background text-foreground;
     }
+  }
+
+  .test  {
+    background: hsl(139, 25%, 27%);
   }

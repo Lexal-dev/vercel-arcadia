@@ -6,10 +6,10 @@ const AvisList: React.FC = () => {
     const [avisList, setAvisList] = useState<Avis[]>([]);
     const [randomAvis, setRandomAvis] = useState<Avis[]>([]);
 
-    useEffect(() => {
-        const fetchAvis = async () => {
+  
+        const fetchAvis = async (additionalParam: string | number) => {
             try {
-                const response = await fetch('/api/avis/read'); // Assurez-vous que l'API est correctement exposée à cette URL
+                const response = await fetch(`/api/avis/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch avis');
                 }
@@ -25,9 +25,10 @@ const AvisList: React.FC = () => {
             }
         };
 
-        fetchAvis();
-    }, []);
 
+    useEffect(() => {
+        fetchAvis('avis')
+    }, [])
     useEffect(() => {
         if (avisList.length > 0) {
             const randomIndexes = generateRandomIndexes(avisList.length, 5);
@@ -49,17 +50,17 @@ const AvisList: React.FC = () => {
     };
 
     return (
-        <div className="avis-list border-2 p-4 rounded-md">
+        <div className="avis-list border-2 p-4 rounded-md bg-muted">
             {randomAvis.length > 0 ? (
                 <ul className='flex flex-wrap justify-around gap-4'>
                     {randomAvis.map((avis) => (
-                        <li key={avis.id} className='border border-slate-200 p-2 rounded-lg max-w-[350px] bg-slate-500'>
-                            <div className='flex gap-2 mb-4'>
-                                <p className='text-lg font-bold'>Pseudo:</p>
-                                <p className='text-md '>{avis.pseudo}</p>
+                        <li key={avis.id} className='border border-slate-200 p-2 rounded-lg w-[300px] h-[200px] bg-muted-foreground'>
+                            <div className='flex items-center gap-2 mb-6'>
+                                <p className='text-sm font-bold'>Pseudo:</p>
+                                <p className='text-xl '>{avis.pseudo}</p>
                             </div>
                             <div className='flex flex-col gap-2'>
-                                <p className='text-lg font-bold'>Commentaire:</p>
+                                <p className='text-sm font-bold'>Commentaire:</p>
                                 <p className='text-md'>{avis.comment}</p>
                             </div>
                         </li>

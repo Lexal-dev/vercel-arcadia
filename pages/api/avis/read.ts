@@ -1,7 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Avis from '@/models/avis';
+import { redirectIfNeeded } from '@/lib/redirectApi'; 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+
+    const additionalParam = req.query.additionalParam;
+    if (additionalParam !== 'avis') {
+        if (redirectIfNeeded(req, res, '/api/avis/read', '/')) {
+            return;
+        }
+    }
+
     if (req.method === 'GET') {
         try {
             const avis = await Avis.findAll();

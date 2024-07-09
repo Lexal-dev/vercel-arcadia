@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <UserProvider>
           <Header />
-            <div className="min-h-screen bg-slate-700 text-white pt-[450px]">
+            <div className="text-white pt-[250px]">
               {children}           
             </div>
           <Footer />

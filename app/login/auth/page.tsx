@@ -39,26 +39,29 @@ const ConnectedPage: React.FC = () => {
     return <p className='w-full flex justify-center items-center text-center min-h-[500px]'>Chargement des données...</p>;
   }
 
-    const userRole = currentUser.userRole
-    userRole.toLowerCase()
-    const userSpace = `/login/auth/${userRole.toLowerCase()}`;
-
   return (
-    <main className='flex flex-col items-center py-12'>
-      <button className="rounded-full flex justify-center items-center border-4 border-red-400 hover:border-red-600 w-[60px] h-[60px] mb-6" onClick={handleLogout}>
-          <small className='text-bold text-red-400 hover:text-red-600'>Logout</small>
-      </button>
-      <div className='w-1/4'>
-        <div className='flex items-center  gap-2 mb-1'>
-          <p className='text-md'>Email:</p>
-          <p className='text-md'>{currentUser.userEmail}</p>
-        </div>
-        <div className='flex items-center  gap-2 mb-1'>
-          <p className='text-md'>Role:</p>
-          <p className='text-md'>{currentUser.userRole}</p>
-        </div>
-        <Link href={userSpace}>Espace dédié</Link>        
+    <main className='flex flex-col items-center py-12 px-2'>
+      <h1 className='text-4xl font-bold mb-12'>Bienvenue sur votre espace dédiés!</h1>
+
+      <div className='flex flex-col md:flex-row w-full justify-around items-center my-12'>
+
+          <div className='w-full md:w-1/2 mb-12 md:mb-0'>
+            <div className='flex gap-2 mb-6'>
+              <p className='text-lg font-bold'>Email:</p>
+              <p className='text-lg'>{currentUser.userEmail}</p>
+            </div>
+            <div className='flex gap-2'>
+              <p className='text-lg font-bold'>Role:</p>
+              <p className='text-lg'>{currentUser.userRole}</p>
+            </div>
+          </div>
+
+          <button className="w-[100px] h-[100px] rounded-full border-4 border-red-400 hover:border-red-600 text-xl font-bold text-red-400 hover:text-red-600 " onClick={handleLogout}>
+              <p>Logout</p>
+          </button>
+          
       </div>
+      <Link className='text-4xl font-bold mt-12 hover:text-green-500' href={`/login/auth/${currentUser.userRole.toLowerCase()}`}>espace dédié</Link>
     </main>
   );
 };

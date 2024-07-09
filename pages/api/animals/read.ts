@@ -4,8 +4,18 @@ import Race from '@/models/race';
 import Report from '@/models/report';
 import Habitat from '@/models/habitat';
 import VetLog from '@/models/vetLogs';
+import { redirectIfNeeded } from '@/lib/redirectApi';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+
+    
+    const additionalParam = req.query.additionalParam;
+    if (additionalParam !== 'animals') {
+        if (redirectIfNeeded(req, res, '/api/animals/read', '/habitats')) {
+            return;
+        }
+    }
+
     if (req.method === 'GET') {
         try {
             const animals = await Animal.findAll({});
