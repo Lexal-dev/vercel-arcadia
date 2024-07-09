@@ -3,9 +3,14 @@ import { redirectIfNeeded } from '@/lib/redirectApi';
 import Habitat from '@/models/habitat';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    
-    if (redirectIfNeeded(req, res, '/api/habitats/read', '/habitats')) {
-        return;
+
+    const additionalParam = req.query.additionalParam;
+    console.log(additionalParam); // Vérifiez ici si additionalParam est correctement récupéré
+
+    if (additionalParam !== 'habitats') {
+        if (redirectIfNeeded(req, res, '/api/habitats/read', '/habitats')) {
+            return;
+        }
     }
 
     if (req.method === 'GET') {

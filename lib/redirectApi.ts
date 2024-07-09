@@ -8,3 +8,4 @@ export const redirectIfNeeded = (req: NextApiRequest, res: NextApiResponse, curr
     }
     return false;
 };
+

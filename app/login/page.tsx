@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
@@ -7,6 +7,15 @@ const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        // Vérifier si un token est présent dans le localStorage
+        const token = localStorage.getItem('token');
+        if (token) {
+            // Rediriger l'utilisateur vers '/login/auth'
+            router.push('/login/auth');
+        }
+    }, []); // Effect ne dépend d'aucune variable, donc il se déclenchera seulement au montage
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,7 +39,7 @@ const LoginPage = () => {
             // Enregistrer le token dans le localStorage
             localStorage.setItem('token', token);
 
-          
+            // Rediriger l'utilisateur vers '/login/auth'
             router.push('/login/auth');
         } catch (error:any) {
             setError(error.message || 'Erreur lors de la connexion.');
@@ -39,7 +48,6 @@ const LoginPage = () => {
 
     return (
         <main className='min-h-[500px] flex flex-col items-center justify-center'>
-            
             {error && <p style={{ color: 'red' }}>{error}</p>}
             
             <form onSubmit={handleSubmit} className='flex flex-col justify-around min-w-[3/4] min-h-[200px] bg-slate-500 p-4 rounded-lg gap-3'>
@@ -55,9 +63,8 @@ const LoginPage = () => {
                     <input type="password" id="password"  className='w-1/2 rounded-md p-1 text-md text-slate-600'value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
                 <div className='w-full flex justify-center'>
-                  <button type="submit" className='my-2 p-2 border border-slate-600 bg-green-500 hover:bg-green-600 rounded-md'>Se connecter</button>
+                    <button type="submit" className='my-2 p-2 border border-slate-600 bg-green-500 hover:bg-green-600 rounded-md'>Se connecter</button>
                 </div>
-
             </form>
         </main>
     );

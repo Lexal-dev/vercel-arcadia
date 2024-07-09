@@ -13,14 +13,14 @@ const HabitatsManager: React.FC = () => {
 
     // Function to handle successful creation of habitat
     const handleCreateSuccess = async () => {
-        await fetchHabitats(); // Refresh habitats list after creation
+        await fetchHabitats("true"); // Refresh habitats list after creation
         setShowForm(false); // Close the create form after successful creation
     };
 
     // Function to fetch habitats from API
-    const fetchHabitats = async () => {
+    const fetchHabitats = async (additionalParam: string | number) => {
         try {
-            const response = await fetch('/api/habitats/read');
+            const response = await fetch(`/api/habitats/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`);
             const data = await response.json();
             if (data.success) {
                 setHabitats(data.habitats);
@@ -52,7 +52,7 @@ const HabitatsManager: React.FC = () => {
 
     // Fetch habitats when component mounts
     useEffect(() => {
-        fetchHabitats();
+        fetchHabitats('true');
     }, []);
 
     const handleDeleteHabitat = async (id: number) => {
@@ -140,7 +140,7 @@ const HabitatsManager: React.FC = () => {
                 <FormUpdate
                     habitat={selectedHabitat}
                     onUpdateSuccess={() => {
-                        fetchHabitats(); // Refresh habitats list after update
+                        fetchHabitats('true'); // Refresh habitats list after update
                         closeUpdateForm(); // Close the update form after successful update
                     }}
                     onClose={closeUpdateForm}

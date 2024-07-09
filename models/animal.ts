@@ -1,8 +1,7 @@
-// Modèle Animal
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelizeInstance from '@/lib/sequelize';
-import Race from './race'; // Importer directement le modèle Race
-import Habitat from './habitat'; // Importer directement le modèle Habitat
+import Race from './race';
+import Habitat from './habitat';
 
 interface AnimalAttributes {
     id: number;
@@ -10,9 +9,12 @@ interface AnimalAttributes {
     etat: string;
     raceId: number;
     habitatId: number;
+    imageUrl?: string[] | null; 
 }
 
-interface AnimalCreationAttributes extends Optional<AnimalAttributes, 'id'> {}
+interface AnimalCreationAttributes extends Optional<AnimalAttributes, 'id'> {
+    imageUrl?: string[] | null; 
+}
 
 class Animal extends Model<AnimalAttributes, AnimalCreationAttributes> implements AnimalAttributes {
     public id!: number;
@@ -20,10 +22,7 @@ class Animal extends Model<AnimalAttributes, AnimalCreationAttributes> implement
     public etat!: string;
     public raceId!: number;
     public habitatId!: number;
-
-    // Définir les associations statiques pour Sequelize
-    public readonly Race?: Race; // Relation avec Race
-    public readonly Habitat?: Habitat; // Relation avec Habitat
+    public imageUrl!: string[] | null; 
 }
 
 Animal.init(
@@ -58,7 +57,7 @@ Animal.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'races', // Nom de la table races
+                model: 'races',
                 key: 'id',
             },
         },
@@ -66,9 +65,13 @@ Animal.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'habitats', // Nom de la table habitats
+                model: 'habitats', 
                 key: 'id',
             },
+        },
+        imageUrl: {
+            type: DataTypes.ARRAY(DataTypes.STRING),
+            allowNull: true,
         },
     },
     {

@@ -6,19 +6,18 @@ import { storage } from '@/lib/firebaseConfig';
 import { ref, deleteObject } from 'firebase/storage';
 import { useRouter } from 'next/navigation'; // Utilisation de useRouter au lieu de next/navigation
 
-interface Habitat {
+interface Animal {
     id: number;
     name: string;
-    description: string;
-    comment: string;
-    imageUrl: string[];
+    etat: string;
+    imageUrl: string[]; // Assurez-vous que imageUrl est toujours un tableau de chaînes
+    // Autres propriétés de votre modèle Animal
 }
-
 export default function ImageManager() {
-    const [habitats, setHabitats] = useState<Habitat[]>([]);
+    const [animals, setAnimals] = useState<Animal[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedHabitat, setSelectedHabitat] = useState<Habitat | null>(null);
+    const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const router = useRouter();
 
@@ -27,62 +26,60 @@ export default function ImageManager() {
         return url.includes('firebasestorage.googleapis.com');
     }
 
-    // Fonction pour récupérer les habitats depuis l'API
-    const fetchHabitats = async (additionalParam?: string | number) => {
+    // Fonction pour récupérer les animaux depuis l'API
+    const fetchAnimals = async () => {
         try {
-            // Si additionalParam est undefined, vous pouvez choisir de le traiter différemment
-            const param = additionalParam ?? ''; // Valeur par défaut ou logique alternative
-            const response = await fetch(`/api/habitats/read?additionalParam=${encodeURIComponent(param.toString())}`);
+            const response = await fetch('/api/animals/read'); // Assurez-vous que votre API renvoie les animaux
             const data = await response.json();
             if (data.success) {
-                setHabitats(data.habitats);
+                setAnimals(data.animals);
             } else {
-                setError(data.message || 'Failed to fetch habitats');
+                setError(data.message || 'Failed to fetch animals');
             }
         } catch (error) {
-            console.error('Error fetching habitats:', error);
-            setError('An error occurred while fetching habitats');
+            console.error('Error fetching animals:', error);
+            setError('An error occurred while fetching animals');
         } finally {
             setLoading(false);
         }
     };
 
-    // Fonction pour supprimer une URL d'image d'un habitat
-    const deleteImageUrl = async (habitatId: number, index: number, imageUrlToDelete: string) => {
+    // Fonction pour supprimer une URL d'image d'un animal
+    const deleteImageUrl = async (animalId: number, index: number, imageUrlToDelete: string) => {
         try {
-            const habitatToUpdate = habitats.find(hab => hab.id === habitatId);
-            if (!habitatToUpdate) {
-                setError('Habitat not found');
+            const animalToUpdate = animals.find(animal => animal.id === animalId);
+            if (!animalToUpdate) {
+                setError('Animal not found');
                 return;
             }
     
-            const updatedUrls = [...habitatToUpdate.imageUrl];
+            const updatedUrls = [...animalToUpdate.imageUrl];
             updatedUrls.splice(index, 1); // Supprimer l'élément à l'index spécifié
     
             // Supprimer l'image du stockage Firebase
             await deleteImageFromStorage(imageUrlToDelete);
     
-            const response = await fetch('/api/habitats/updateUrl', {
+            const response = await fetch('/api/animals/updateUrl', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ id: habitatId, imageUrl: updatedUrls })
+                body: JSON.stringify({ id: animalId, imageUrl: updatedUrls })
             });
     
             const data = await response.json();
             if (data.message) {
-                const updatedHabitats = habitats.map(hab => {
-                    if (hab.id === habitatId) {
+                const updatedAnimals = animals.map(animal => {
+                    if (animal.id === animalId) {
                         return {
-                            ...hab,
+                            ...animal,
                             imageUrl: updatedUrls
                         };
                     }
-                    return hab;
+                    return animal;
                 });
     
-                setHabitats(updatedHabitats);
+                setAnimals(updatedAnimals);
                 closeModal();
             } else {
                 setError(data.error || 'Failed to delete imageUrl');
@@ -110,33 +107,33 @@ export default function ImageManager() {
         console.log('Clicked Image URL:', clickedUrl);
     };
 
-    // Effet pour récupérer les habitats initiaux
+    // Effet pour récupérer les animaux initiaux
     useEffect(() => {
-        fetchHabitats("true");
+        fetchAnimals();
     }, []);
 
-    // Ouvrir le modal pour gérer les images de l'habitat sélectionné
-    const openModal = (habitat: Habitat) => {
-        setSelectedHabitat(habitat);
+    // Ouvrir le modal pour gérer les images de l'animal sélectionné
+    const openModal = (animal: Animal) => {
+        setSelectedAnimal(animal);
         setIsModalOpen(true);
     };
 
-    // Fermer le modal de gestion des images de l'habitat
+    // Fermer le modal de gestion des images de l'animal
     const closeModal = () => {
         setIsModalOpen(false);
-        setSelectedHabitat(null);
-        router.push("/login/auth/admin/habitatsManager/imageManager"); // Redirection après fermeture
+        setSelectedAnimal(null);
+        router.push("/login/auth/admin/animalsManager/imageManager"); // Redirection après fermeture
     };
 
-    // Fonction appelée après la mise à jour d'un habitat
-    const handleHabitatUpdate = (updatedHabitat: Habitat) => {
-        const updatedHabitats = habitats.map(hab => {
-            if (hab.id === updatedHabitat.id) {
-                return updatedHabitat;
+    // Fonction appelée après la mise à jour d'un animal
+    const handleAnimalUpdate = (updatedAnimal: Animal) => {
+        const updatedAnimals = animals.map(animal => {
+            if (animal.id === updatedAnimal.id) {
+                return updatedAnimal;
             }
-            return hab;
+            return animal;
         });
-        setHabitats(updatedHabitats);
+        setAnimals(updatedAnimals);
     };
 
     // Affichage en cours de chargement
@@ -152,28 +149,26 @@ export default function ImageManager() {
     // Rendu principal de la page
     return (
         <main className='flex flex-col items-center p-12'>
-            <h1 className='text-2xl mb-4 font-bold'>Habitats Management</h1>
+            <h1 className='text-2xl mb-4 font-bold'>Animals Management</h1>
             <div className="overflow-x-auto w-full max-w-4xl">
                 <table className='min-w-full bg-white text-black shadow-md rounded-lg'>
                     <thead className='bg-gray-200'>
                         <tr>
                             <th className='py-3 px-6 border-b text-left'>ID</th>
                             <th className='py-3 px-6 border-b text-left'>Name</th>
-                            <th className='py-3 px-6 border-b text-left'>Description</th>
-                            <th className='py-3 px-6 border-b text-left'>Comment</th>
+                            <th className='py-3 px-6 border-b text-left'>State</th>
                             <th className='py-3 px-6 border-b text-left'>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {habitats.map((habitat) => (
-                            <tr key={habitat.id} className='even:bg-gray-100'>
-                                <td className='py-3 px-6 border-b'>{habitat.id}</td>
-                                <td className='py-3 px-6 border-b'>{habitat.name}</td>
-                                <td className='py-3 px-6 border-b'>{habitat.description}</td>
-                                <td className='py-3 px-6 border-b'>{habitat.comment}</td>
+                        {animals.map((animal) => (
+                            <tr key={animal.id} className='even:bg-gray-100'>
+                                <td className='py-3 px-6 border-b'>{animal.id}</td>
+                                <td className='py-3 px-6 border-b'>{animal.name}</td>
+                                <td className='py-3 px-6 border-b'>{animal.etat}</td>
                                 <td className='py-3 px-6 border-b text-center flex justify-center'>
                                     <button
-                                        onClick={() => openModal(habitat)}
+                                        onClick={() => openModal(animal)}
                                         className='mr-2 text-blue-500'
                                     >
                                         Modifier
@@ -185,19 +180,19 @@ export default function ImageManager() {
                 </table>
             </div>
 
-            {/* Modal pour gérer les images de l'habitat sélectionné */}
-            {isModalOpen && selectedHabitat && (
+            {/* Modal pour gérer les images de l'animal sélectionné */}
+            {isModalOpen && selectedAnimal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                     <div className="flex flex-col justify-between modal-content min-w-[1000px] min-h-[500px] bg-white text-black p-8 rounded-lg shadow-lg">
                         <div className='flex justify-between items-center mb-4'>
-                            <h2 className="w-full text-4xl font-bold text-center">URL/IMAGES -&gt; {selectedHabitat.name}</h2>
+                            <h2 className="w-full text-4xl font-bold text-center">Images - {selectedAnimal.name}</h2>
                             <span className="cursor-pointer text-4xl hover:text-red-500" onClick={closeModal}>&times;</span>
                         </div>
                         
                         <div className='flex flex-col w-full items-around'>
                             <ul className='flex flex-wrap items-start justify-start'>
-                                {/* Affichage des images de l'habitat */}
-                                {selectedHabitat.imageUrl && selectedHabitat.imageUrl.map((url, index) => (
+                                {/* Affichage des images de l'animal */}
+                                {selectedAnimal.imageUrl && selectedAnimal.imageUrl.map((url, index) => (
                                     <li key={index} className=' p-2' onClick={() => handleImageClick(url)}>
                                         {isValidUrl(url) ? (
                                             <div className='w-full flex gap-3'>
@@ -205,7 +200,7 @@ export default function ImageManager() {
                                                 <div className='flex flex-col justify-between items-start'>
                                                     <small>{url}</small>
                                                     {/* Bouton pour supprimer une image */}
-                                                    <button onClick={() => deleteImageUrl(selectedHabitat.id, index, url)} className="ml-2 text-red-500 hover:text-red-700">
+                                                    <button onClick={() => deleteImageUrl(selectedAnimal.id, index, url)} className="ml-2 text-red-500 hover:text-red-700">
                                                         Supprimer
                                                     </button>
                                                 </div>
@@ -217,7 +212,7 @@ export default function ImageManager() {
                                         )}
                                     </li>
                                 ))}
-                                {!selectedHabitat.imageUrl && (
+                                {!selectedAnimal.imageUrl && (
                                     <li>Aucune URL d&apos;image disponible</li>
                                 )}
                             </ul>
@@ -226,11 +221,11 @@ export default function ImageManager() {
                         <div className='flex flex-col items-center'>
                             {/* Composant ImageUploader pour télécharger de nouvelles images */}
                             <ImageUploader
-                                folderName="habitats"
-                                selectedItem={selectedHabitat} // Passer l'habitat sélectionné
+                                folderName="animals"
+                                selectedItem={selectedAnimal} // Passer l'animal sélectionné
                                 onClose={closeModal}
-                                onUpdate={handleHabitatUpdate}
-                                fieldToUpdate="imageUrl" // Champ à mettre à jour dans l'habitat (imageUrl)
+                                onUpdate={handleAnimalUpdate}
+                                fieldToUpdate="imageUrl" // Champ à mettre à jour dans l'animal (imageUrl)
                             />
                         </div>
                     </div>
