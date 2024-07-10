@@ -140,7 +140,7 @@ export default function VetLogsList() {
         <table className='w-full bg-foreground text-secondary'>
           <thead>
             <tr className='bg-muted text-white'>
-              <th className='p-2 border'>Nom de l'animal</th>
+              <th className='p-2 border'>Nom de l&apos;animal</th>
               <th className='p-2 border'>Race</th>
             </tr>
           </thead>
