@@ -39,7 +39,7 @@ export default function FormCreate() {
     return (
         <>
             {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} />}
-            <h1 className='font-bold text-4xl text-center'>Votre avis</h1>
+            <h1 className='font-bold text-4xl text-center mb-10'>Votre avis</h1>
             <form onSubmit={handleSubmit} className='flex flex-col min-w-[300px] border-2 border-slate-300 rounded-md p-6 gap-6 bg-muted'>
                 <div className='flex flex-col gap-6'>
                     <div className='flex gap-3 justify-between items-center'>

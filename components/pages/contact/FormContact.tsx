@@ -1,4 +1,5 @@
 "use client"
+import NekoToast from '@/components/ui/_partial/Toast';
 import { useState } from 'react';
 
 export default function FormContact() {
@@ -9,6 +10,7 @@ export default function FormContact() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [toast, setToast] = useState<{ type: 'Success' | 'Error'; message: string } | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -25,10 +27,8 @@ export default function FormContact() {
             });
 
             if (response.ok) {
-                const data = await response.json();
-                console.log('Email sent successfully:', data);
                 setIsSuccess(true);
-                // Réinitialiser le formulaire après un envoi réussi si nécessaire
+                setToast({ type: 'Success', message: 'Envoi du contact réussi !' });
                 setFormData({
                     email: '',
                     title: '',
@@ -36,12 +36,11 @@ export default function FormContact() {
                 });
             } else {
                 const error = await response.json();
-                console.error('Failed to send email:', error);
-                // Gérer ici les erreurs d'envoi
+                setToast({ type: 'Error', message: `Échec de l'envoi du contact: ${error}` });
             }
         } catch (error) {
             console.error('Failed to send email:', error);
-            // Gérer ici les erreurs d'exception
+            setToast({ type: 'Error', message: 'Erreur réseau lors de l\'envoi du message.' });
         } finally {
             setIsLoading(false);
         }
@@ -53,14 +52,14 @@ export default function FormContact() {
 
     return (
         <>
-            <form className="flex flex-col min-w-[300px] border-2 border-slate-300 rounded-md p-6 gap-6" onSubmit={handleSubmit}>
+            <form className="flex flex-col w-full md:min-w-[500px] border-2 border-slate-300 bg-muted rounded-md p-6 gap-6" onSubmit={handleSubmit}>
                 <div className="flex gap-3 justify-center items-center">
                     <label className="w-1/3 text-lg font-bold">Email : </label>
                     <input
                         type="email"
                         name="email"
                         placeholder="arcadia.zoo@yahoo.fr"
-                        className="w-2/3 p-2 rounded-md text-black"
+                        className="w-2/3 p-2 rounded-md bg-background hover:bg-muted-foreground"
                         value={formData.email}
                         onChange={handleChange}
                         required
@@ -72,7 +71,7 @@ export default function FormContact() {
                         type="text"
                         name="title"
                         placeholder="Animaux sauvage..."
-                        className="w-2/3 p-2 rounded-md text-black"
+                        className="w-2/3 p-2 rounded-md bg-background hover:bg-muted-foreground"
                         value={formData.title}
                         onChange={handleChange}
                         required
@@ -83,7 +82,7 @@ export default function FormContact() {
                     <textarea
                         name="message"
                         placeholder="Insérez votre demande ici ..."
-                        className="w-2/3 p-2 rounded-md text-black"
+                        className="w-2/3 p-2 rounded-md bg-background hover:bg-muted-foreground"
                         value={formData.message}
                         onChange={handleChange}
                         required
@@ -100,6 +99,7 @@ export default function FormContact() {
             {isSuccess && (
                 <p className="text-green-700 text-center mt-4">Votre message a été envoyé avec succès !</p>
             )}
+            {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} />}
         </>
     );
 }

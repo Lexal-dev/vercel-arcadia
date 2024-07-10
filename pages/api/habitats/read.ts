@@ -5,7 +5,6 @@ import Habitat from '@/models/habitat';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const additionalParam = req.query.additionalParam;
-    console.log(additionalParam); // Vérifiez ici si additionalParam est correctement récupéré
 
     if (additionalParam !== 'habitats') {
         if (redirectIfNeeded(req, res, '/api/habitats/read', '/habitats')) {

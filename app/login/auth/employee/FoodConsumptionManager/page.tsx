@@ -1,50 +1,32 @@
-
 "use client";
 import React, { useEffect, useState } from 'react';
 import Animal from '@/models/animal';
 import Habitat from '@/models/habitat';
+import { MdDelete, MdEdit } from 'react-icons/md';
+import { NekoToast } from '@/components/ui/_partial/Toast';
 
-export default function AnimalsManager() {
+const AnimalsManager = () => {
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [habitats, setHabitats] = useState<Habitat[]>([]);
   const [selectedHabitatName, setSelectedHabitatName] = useState<string | null>(null);
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
-  const [showFormUpdate, setShowFormUpdate] = useState<boolean>(false);
-  const [showFormCreate, setShowFormCreate] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false); // State for modal visibility
   const [food, setFood] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
-
-  useEffect(() => {
-    fetchAnimals();
-    fetchHabitats();
-  }, []);
-
-  const fetchAnimals = async () => {
+  const [toast, setToast] = useState<{ type: 'Success' | 'Error' | 'Delete' | 'Update'; message: string } | null>(null);
+  
+  const fetchAnimals = async (additionalParam: string | number) => {
     try {
-      const response = await fetch('/api/animals/read');
+      const response = await fetch(`/api/animals/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`);
       const data = await response.json();
       if (data.success) {
         setAnimals(data.animals);
+        setHabitats(data.habitats);
       } else {
         console.error('Failed to fetch animals:', data.message);
       }
-    } catch (error) {
+    } catch(error) {
       console.error('Error fetching animals:', error);
-    }
-  };
-
-  const fetchHabitats = async () => {
-    try {
-      const response = await fetch('/api/habitats/read');
-      const data = await response.json();
-      if (data.success) {
-        setHabitats(data.habitats);
-      } else {
-        console.error('Failed to fetch habitats:', data.message);
-      }
-    } catch (error) {
-      console.error('Error fetching habitats:', error);
     }
   };
 
@@ -61,22 +43,15 @@ export default function AnimalsManager() {
       const data = await response.json();
       if (data.success) {
         setAnimals(animals.filter(animal => animal.id !== id));
+        showToast('Delete', 'Animal supprimé avec succès.');
       } else {
         console.error('Error deleting animal:', data.message);
+        showToast('Error', `Erreur lors de la suppression de l'animal: ${data.message}`);
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error deleting animal:', error);
+      showToast('Error', `Erreur lors de la suppression de l'animal: ${error.message}`);
     }
-  };
-
-  const handleUpdateSuccess = async () => {
-    await fetchAnimals(); // Refresh animal list after update
-    setShowFormUpdate(false); // Close update form after successful update
-  };
-
-  const handleCreateSuccess = async () => {
-    await fetchAnimals(); // Refresh animal list after creation
-    setShowFormCreate(false); // Close create form after successful creation
   };
 
   const openModal = (animal: Animal) => {
@@ -94,7 +69,7 @@ export default function AnimalsManager() {
     e.preventDefault();
 
     if (!selectedAnimal) {
-      alert('Animal non sélectionné.');
+      showToast('Update', `Animal non sélectionné.`);
       return;
     }
 
@@ -116,23 +91,39 @@ export default function AnimalsManager() {
 
       const data = await response.json();
       if (data.success) {
-        alert('Consommation de nourriture ajoutée avec succès.');
+        showToast('Success', `Consommation de nourriture ajoutée avec succès.`);
         closeModal();
       } else {
         console.error('Error adding food consumption:', data.message);
+        showToast('Error', `Erreur lors de l'ajout de la consommation de nourriture: ${data.message}`);
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error adding food consumption:', error);
+      showToast('Error', `Erreur lors de l'ajout de la consommation de nourriture: ${error.message}`);
     }
   };
 
+  const showToast = (type: 'Success' | 'Error' | 'Delete' | 'Update', message: string) => {
+    setToast({ type, message });
+    setTimeout(() => {
+        setToast(null);
+    }, 3000); // Masquer le toast après 3 secondes
+  };
+
+  useEffect(() => {
+    fetchAnimals('animals');
+  }, []);
+  
   const filteredAnimals = selectedHabitatName
     ? animals.filter(animal => animal.habitatId.toString() === selectedHabitatName)
     : animals;
 
+
   return (
-    <>
-      <div className='w-full flex flex-col justify-center items-center py-4'>
+    <main className='w-full flex flex-col justify-center px-2 items-center py-6'>
+
+      <div className='mb-4'>
+        {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} />}
         <select onChange={handleHabitatChange} className='text-black p-1 rounded-md bg-slate-300 h-[50px] w-[150px]'>
           <option value="">Tous les habitats</option>
           {habitats.map(habitat => (
@@ -143,30 +134,34 @@ export default function AnimalsManager() {
         </select>
       </div>
 
-      <div className='w-full'>
-        <table className='min-w-full bg-white text-black shadow-md rounded-lg'>
-          <thead className='bg-gray-200'>
-            <tr>
-              <th className='py-3 px-6 border-b text-left'>ID</th>
+      <div className='w-full md:w-2/3 overflow-x-auto'>
+        <table className='w-full table-auto bg-white shadow-md md:rounded-lg'>
+          <thead>
+            <tr className="bg-muted-foreground">
               <th className='py-3 px-6 border-b text-left'>Nom</th>
               <th className='py-3 px-6 border-b text-left'>Race</th>
               <th className='py-3 px-6 border-b text-left'>Habitat</th>
-              <th className='py-3 px-6 border-b text-center'>Action</th>
+              <th className='px-4 py-2 text-center'>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredAnimals.map(animal => (
-              <tr key={animal.id} className='cursor-pointer hover:bg-gray-100'>
-                <td className='py-3 px-6 border-b'>{animal.id}</td>
-                <td className='py-3 px-6 border-b'>{animal.name}</td>
-                <td className='py-3 px-6 border-b'>{animal.raceId}</td>
-                <td className='py-3 px-6 border-b'>{animal.habitatId}</td>
-                <td className='py-3 px-6 border-b flex justify-center'>
+              <tr key={animal.id} className='border-t bg-foreground text-secondary hover:bg-muted hover:text-white'>
+                <td className='px-4 py-2'>{animal.name}</td>
+                <td className='px-4 py-2'>{animal.raceId}</td>
+                <td className='px-4 py-2'>{animal.habitatId}</td>
+                <td className='px-4 py-2 flex justify-center items-center space-x-4'>
                   <button
                     onClick={() => openModal(animal)}
-                    className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600'
+                    className='text-green-600 hover:text-green-700'
                   >
-                    Faire un rapport de consommation
+                    <MdEdit size={24} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteAnimal(animal.id)}
+                    className='text-red-500 hover:text-red-600'
+                  >
+                    <MdDelete size={24} />
                   </button>
                 </td>
               </tr>
@@ -176,9 +171,9 @@ export default function AnimalsManager() {
       </div>
 
       {showModal && selectedAnimal && (
-        <div className='fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75'>
-          <div className='bg-white p-6 rounded-lg shadow-lg'>
-            <h2 className='text-xl font-semibold mb-4'>Ajouter un rapport de consommation pour {selectedAnimal.name}</h2>
+        <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-75'>
+          <div className='bg-foreground text-secondary p-6 rounded-lg shadow-lg md:w-[600px] md:h-[400px]'>
+            <h2 className='text-xl font-semibold mb-6'>Ajouter un rapport de consommation pour {selectedAnimal.name}</h2>
             <form onSubmit={handleSubmit} className='space-y-4'>
               <div>
                 <label className='block text-gray-700'>Nourriture</label>
@@ -186,7 +181,7 @@ export default function AnimalsManager() {
                   type="text"
                   value={food}
                   onChange={(e) => setFood(e.target.value)}
-                  className='w-full p-2 border rounded text-black' // Updated text color to black
+                  className='w-full p-2 border rounded bg-muted hover:bg-muted-foreground text-white'
                   required
                 />
               </div>
@@ -196,7 +191,7 @@ export default function AnimalsManager() {
                   type="number"
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
-                  className='w-full p-2 border rounded text-black' // Updated text color to black
+                  className='w-full p-2 border rounded bg-muted hover:bg-muted-foreground text-white'
                   required
                   min={1}
                 />
@@ -217,6 +212,8 @@ export default function AnimalsManager() {
           </div>
         </div>
       )}
-    </>
+    </main>
   );
 }
+
+export default AnimalsManager;

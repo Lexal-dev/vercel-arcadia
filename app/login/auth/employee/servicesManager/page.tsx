@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import { MdEdit } from 'react-icons/md';
 import FormUpdate from '@/components/api/services/employeeFormUpdate';
@@ -13,17 +13,25 @@ export default function ServiceManager() {
   const [services, setServices] = useState<Service[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
+  const fetchServices = async (additionalParam: string | number) => {
+    try {
+      const response = await fetch(`/api/services/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch services');
+      }
+      const data = await response.json();
+      if (data.success) {
+        setServices(data.services);
+      } else {
+        throw new Error(data.message || 'Failed to fetch services');
+      }
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    }
+  };
+
   useEffect(() => {
-    fetch('/api/services/read')
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.success) {
-          setServices(data.services);
-        } else {
-          console.error('Failed to fetch services:', data.message);
-        }
-      })
-      .catch(error => console.error('Error fetching services:', error));
+    fetchServices('default'); // Replace 'default' with the actual parameter you need
   }, []);
 
   const handleEditService = (service: Service) => {
@@ -32,37 +40,28 @@ export default function ServiceManager() {
 
   const handleUpdateSuccess = () => {
     setSelectedService(null);
-    fetch('/api/services/read')
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.success) {
-          setServices(data.services);
-        } else {
-          console.error('Failed to fetch services:', data.message);
-        }
-      })
-      .catch(error => console.error('Error fetching services:', error));
+    fetchServices('default'); // Replace 'default' with the actual parameter you need
   };
 
   return (
-    <div className=' flex flex-col items-center w-full p-6'>
-      <div className="overflow-x-auto shadow-md sm:rounded-lg w-2/3">
-        <table className="min-w-full bg-white text-black">
-          <thead className="bg-gray-800 text-white">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Nom</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Description</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-center">Actions</th>
+    <main className="w-full flex-col flex py-12 px-2 items-center">
+      <div className="lg:w-2/3 overflow-x-auto  shadow-md md:rounded-lg">
+        <table className="w-full table-auto">
+          <thead>
+            <tr className="bg-gray-800 text-white">
+              <th className="w-1/5 px-4 py-2 text-left">Nom</th>
+              <th className="w-3/5 px-4 py-2 text-left">Description</th>
+              <th className="w-1/5 px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody>
             {services.map(service => (
-              <tr key={service.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{service.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{service.description}</td>
-                <td className="px-6 py-4 whitespace-nowrap flex justify-center">
-                  <button onClick={() => handleEditService(service)} className="text-blue-500 hover:text-blue-700">
-                    <MdEdit size={24} color='green'/>
+              <tr key={service.id} className="border-t bg-foreground text-secondary hover:bg-muted hover:text-white">
+                <td className="w-1/5 px-4 py-2">{service.name}</td>
+                <td className="w-3/5 px-4 py-2">{service.description}</td>
+                <td className="w-full min-h-[100px] flex flex-col justify-center items-center">
+                  <button onClick={() => handleEditService(service)} className="text-yellow-500 hover:text-yellow-700">
+                    <MdEdit size={32} />
                   </button>
                 </td>
               </tr>
@@ -78,6 +77,6 @@ export default function ServiceManager() {
           onClose={() => setSelectedService(null)}
         />
       )}
-    </div>
+    </main>
   );
 }

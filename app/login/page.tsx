@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const LoginPage = () => {
+export default function LoginPage(){
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -47,27 +47,25 @@ const LoginPage = () => {
     };
 
     return (
-        <main className='min-h-[500px] flex flex-col items-center justify-center'>
+        <main className='flex flex-col w-full items-center justify-center py-12 px-2'>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             
-            <form onSubmit={handleSubmit} className='flex flex-col justify-around min-w-[3/4] min-h-[200px] bg-slate-500 p-4 rounded-lg gap-3'>
+            <form onSubmit={handleSubmit} className='flex flex-col justify-around md:min-w-[500px] min-h-[350px]  p-4 rounded-lg gap-3 bg-muted shadow-md'>
                 <h3 className='text-3xl text-center mb-6'>Connexion</h3>
 
                 <div className='flex justify-center items-center'>
-                    <label htmlFor="email" className='w-1/2 text-lg'>Email</label>
-                    <input type="email" id="email" className='w-1/2 rounded-md p-1 text-md text-slate-600' value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    <label htmlFor="email" className='w-1/3 text-lg'>Email</label>
+                    <input type="email" id="email" className='w-2/3 rounded-md p-1 text-md bg-background hover:bg-muted-foreground' value={email} onChange={(e) => setEmail(e.target.value)} required />
                 </div>
 
                 <div className='flex justify-center items-center'>
-                    <label htmlFor="password" className='w-1/2 text-lg'>Mot de passe</label>
-                    <input type="password" id="password"  className='w-1/2 rounded-md p-1 text-md text-slate-600'value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <label htmlFor="password" className='w-1/3 text-lg'>Mot de passe</label>
+                    <input type="password" id="password"  className='w-2/3 rounded-md p-1 text-md bg-background hover:bg-muted-foreground'value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
-                <div className='w-full flex justify-center'>
-                    <button type="submit" className='my-2 p-2 border border-slate-600 bg-green-500 hover:bg-green-600 rounded-md'>Se connecter</button>
+                <div className='w-full flex'>
+                    <button type="submit" className='w-full my-2 p-2 border border-slate-600 bg-green-500 hover:bg-green-600 rounded-md'>Se connecter</button>
                 </div>
             </form>
         </main>
     );
 };
-
-export default LoginPage;

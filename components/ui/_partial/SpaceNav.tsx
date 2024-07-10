@@ -17,17 +17,17 @@ const SpaceNav: React.FC<SpaceNavProps> = ({ role }) => {
         { name: "Dashboard", path: "/login/auth/admin/dashboard", roles: ["ADMIN"] },
         { name: "Utilisateurs", path: "/login/auth/admin/usersManager", roles: ["ADMIN"] },
         { name: "Animaux", path: "/login/auth/admin/animalsManager", roles: ["ADMIN"] },
-        { name: "Rapports Vétérinaire", path: "/login/auth/admin/showVetLogs", roles: ["ADMIN"] },
+        { name: "Rapports-Vétérinaire", path: "/login/auth/admin/showVetLogs", roles: ["ADMIN"] },
         { name: "Habitats", path: "/login/auth/admin/habitatsManager", roles: ["ADMIN"] },
         { name: "Services", path: "/login/auth/admin/servicesManager", roles: ["ADMIN"] },
         { name: "horraires", path: "/login/auth/admin/hoursManager", roles: ["ADMIN"] },
 
         { name: "Avis", path: "/login/auth/employee/avisManager", roles: ["EMPLOYEE", "ADMIN"] },
         { name: "Services", path: "/login/auth/employee/servicesManager", roles: ["EMPLOYEE", "ADMIN"] },
-        { name: "Nourritures rapports", path: "/login/auth/employee/foodConsumptionManager", roles: ["EMPLOYEE", "ADMIN"] },
+        { name: "Nourritures-rapports", path: "/login/auth/employee/foodConsumptionManager", roles: ["EMPLOYEE", "ADMIN"] },
 
-        { name: "Rapports animalié", path: "/login/auth/veterinarian/vetLogsManager", roles: ["VETERINARIAN", "ADMIN"] },
-        { name: "Habitats commentaire", path: "/login/auth/veterinarian/habCommentsManager", roles: ["VETERINARIAN", "ADMIN"] },
+        { name: "Rapports-animalié", path: "/login/auth/veterinarian/vetLogsManager", roles: ["VETERINARIAN", "ADMIN"] },
+        { name: "Habitats-commentaire", path: "/login/auth/veterinarian/habCommentsManager", roles: ["VETERINARIAN", "ADMIN"] },
         
     ];
 
@@ -35,16 +35,19 @@ const SpaceNav: React.FC<SpaceNavProps> = ({ role }) => {
     const filteredNavItems = spaceNav.filter(navItem => navItem.roles.includes(role));
 
     return (
-        <nav className="bg-green-200">
-            <ul className="flex flex-wrap items-center justify-center gap-6">
-                {filteredNavItems.map((navItem, index) => (
-                    <li key={index} className="text-lg font-semibold text-blue-600 hover:text-blue-800">
-                        <Link href={navItem.path}>
-                                {navItem.name}    
-                        </Link>
-                    </li>
-                ))}
-            </ul>
+        <nav className="px-4">
+            <div className="bg-muted rounded-b-lg py-2">
+                <ul className="flex flex-wrap items-center justify-center gap-6">
+                    {filteredNavItems.map((navItem, index) => (
+                        <li key={index} className="text-lg font-semibold hover:text-secondary">
+                            <Link href={navItem.path}>
+                                    {navItem.name}    
+                            </Link>
+                        </li>
+                    ))}
+                </ul>                
+            </div>
+
         </nav>
     );
 };

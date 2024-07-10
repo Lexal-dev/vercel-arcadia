@@ -27,9 +27,9 @@ export default function ImageManager() {
     }
 
     // Fonction pour récupérer les animaux depuis l'API
-    const fetchAnimals = async () => {
+    const fetchAnimals = async (additionalParam: string | number) => {
         try {
-            const response = await fetch('/api/animals/read'); // Assurez-vous que votre API renvoie les animaux
+            const response = await fetch(`/api/animals/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`);
             const data = await response.json();
             if (data.success) {
                 setAnimals(data.animals);
@@ -109,7 +109,7 @@ export default function ImageManager() {
 
     // Effet pour récupérer les animaux initiaux
     useEffect(() => {
-        fetchAnimals();
+        fetchAnimals('animals');
     }, []);
 
     // Ouvrir le modal pour gérer les images de l'animal sélectionné

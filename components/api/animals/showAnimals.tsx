@@ -1,9 +1,10 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, doc, updateDoc, increment, setDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, increment, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseConfig';
 import Animal from '@/models/animal';
 import Habitat from '@/models/habitat';
+import { TbHandFinger } from "react-icons/tb";
 
 export default function ShowAnimals() {
   const [animals, setAnimals] = useState<Animal[]>([]);
@@ -12,8 +13,8 @@ export default function ShowAnimals() {
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [modal, setModal] = useState<boolean>(false);
 
-  useEffect(() => {
-    fetch('/api/animals/read')
+  const fetchAnimals = async (additionalParam: string | number) => { 
+    fetch(`/api/animals/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`)
       .then(response => response.json())
       .then(data => {
         if (data && data.success) {
@@ -24,6 +25,10 @@ export default function ShowAnimals() {
         }
       })
       .catch(error => console.error('Error fetching data:', error));
+  };
+
+  useEffect(() => {
+    fetchAnimals('animals');
   }, []);
 
   const handleHabitatChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -67,6 +72,12 @@ export default function ShowAnimals() {
     ? animals.filter(animal => animal.habitatId.toString() === selectedHabitatName)
     : animals;
 
+  // Récupérer l'habitat sélectionné
+  const selectedHabitat = habitats.find(habitat => habitat.name === selectedHabitatName);
+
+  // URL de l'image de remplacement
+  const defaultImageUrl = '/images/Tiger.png';
+
   return (
     <>
       <select onChange={handleHabitatChange} className='text-black p-1 rounded-md bg-slate-300 mb-6'>
@@ -77,13 +88,18 @@ export default function ShowAnimals() {
           </option>
         ))}
       </select>
-      <div className='w-full'>
-        <div className='flex items-center items-center gap-3'>
-          <h2 className='text-2xl font-bold mb-4'>Liste des animaux</h2>
+      {selectedHabitat && selectedHabitat.imageUrl && selectedHabitat.imageUrl.length > 0 && (
+        <div className="w-full flex justify-center mb-4">
+          <img src={selectedHabitat.imageUrl[0]} alt={selectedHabitat.name} className="w-[500px] h-auto rounded-md border-2 border-green-100" />
+        </div>
+      )}
+      <div className='flex flex-col md:w-2/3 items-start text-start'>
+        <div className=''>
+          <h2 className='text-3xl font-bold mb-4'>Liste des animaux</h2>
           {selectedHabitatName ? (
-            <p className='text-xl font-bold mb-4'>[{selectedHabitatName}]</p>
+            <p className='text-2xl font-bold mb-4'>[{selectedHabitatName}]</p>
           ) : (
-            <p className='text-xl font-bold mb-4'>[Complète]</p>
+            <p className='text-2xl font-bold mb-4'>[Complète]</p>
           )}
         </div>
 
@@ -93,9 +109,9 @@ export default function ShowAnimals() {
               key={animal.id}
               value={animal.id}
               onClick={() => handleAnimalId(animal.id)}
-              className='cursor-pointer hover:text-green-500'
+              className='flex gap-2 items-center text-lg cursor-pointer hover:text-green-500'
             >
-              {animal.name} : {animal.raceId}
+              <TbHandFinger /> {animal.name} : {animal.raceId}
             </li>
           ))}
         </ul>
@@ -103,16 +119,25 @@ export default function ShowAnimals() {
 
       {modal && selectedAnimal && (
         <div className='fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'>
-          <div className='bg-white rounded-lg p-4 max-w-xl w-full text-black'>
-            <div className='flex justify-between items-center'>
-              <h2 className='text-xl font-semibold mb-2'>Détails sur {selectedAnimal.name}</h2>
-              <button onClick={() => setModal(false)} className='text-red-600 hover:text-red-700 text-xl hover:text-2xl'>
-                X
-              </button>
+          <div className='flex flex-col items-center bg-foreground text-secondary rounded-lg p-4 max-w-xl w-full text-black'>
+            <div 
+              className='h-[250px] w-full rounded-lg' 
+              style={{ 
+                backgroundImage: `url(${selectedAnimal.imageUrl && selectedAnimal.imageUrl.length > 0 ? selectedAnimal.imageUrl[0] : defaultImageUrl})`, 
+                backgroundSize: 'cover', 
+                backgroundPosition: 'center' 
+              }}
+            ></div>
+            <h2 className='text-xl font-semibold mb-4 text-start w-full'>Détails sur {selectedAnimal.name}</h2>
+            <div className='flex flex-col w-1/3 items-start justify-center'>
+              <p>Race: {selectedAnimal.raceId}</p>
+              <p>État: {selectedAnimal.etat}</p>
+              <p>Habitat: {selectedAnimal.habitatId}</p>
             </div>
-            <p>Race: {selectedAnimal.raceId}</p>
-            <p>État: {selectedAnimal.etat}</p>
-            <p>Habitat: {selectedAnimal.habitatId}</p>
+
+            <button className='w-full bg-muted hover:bg-muted-foreground text-white px-4 py-2 mt-4 rounded-md' onClick={() => setModal(false)}>
+              Fermer
+            </button>
           </div>
         </div>
       )}

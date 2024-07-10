@@ -8,11 +8,11 @@ const HomePage = () => {
   return (
     <main className='flex flex-col items-center py-12'>
       <Presentation />
-      <div className='my-6'></div>
+      <div className='my-12'></div>
       <Activity />
-      <div className='my-6'></div>
+      <div className='my-12'></div>
       <Avis />
-      <div className='my-6'></div>
+      <div className='my-12'></div>
       <FormCreate />
     </main>
   );

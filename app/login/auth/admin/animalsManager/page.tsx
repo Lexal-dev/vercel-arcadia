@@ -14,16 +14,16 @@ export default function AnimalsManager() {
   const [showFormCreate, setShowFormCreate] = useState<boolean>(false); // State for create form visibility
 
   useEffect(() => {
-    fetchAnimals();
-    fetchHabitats();
+    fetchAnimals('animals');
   }, []);
 
-  const fetchAnimals = async () => {
+  const fetchAnimals = async (additionalParam: string | number) => {
     try {
-      const response = await fetch('/api/animals/read');
+      const response = await fetch(`/api/animals/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`);
       const data = await response.json();
       if (data.success) {
         setAnimals(data.animals);
+        setHabitats(data.habitats);
       } else {
         console.error('Failed to fetch animals:', data.message);
       }
@@ -32,19 +32,6 @@ export default function AnimalsManager() {
     }
   };
 
-  const fetchHabitats = async () => {
-    try {
-      const response = await fetch('/api/habitats/read');
-      const data = await response.json();
-      if (data.success) {
-        setHabitats(data.habitats);
-      } else {
-        console.error('Failed to fetch habitats:', data.message);
-      }
-    } catch (error) {
-      console.error('Error fetching habitats:', error);
-    }
-  };
 
   const handleHabitatChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const habitatName = event.target.value;
@@ -68,12 +55,12 @@ export default function AnimalsManager() {
   };
 
   const handleUpdateSuccess = async () => {
-    await fetchAnimals(); // Refresh animal list after update
+    await fetchAnimals('animals'); // Refresh animal list after update
     setShowFormUpdate(false); // Close update form after successful update
   };
 
   const handleCreateSuccess = async () => {
-    await fetchAnimals(); // Refresh animal list after creation
+    await fetchAnimals('animals'); // Refresh animal list after creation
     setShowFormCreate(false); // Close create form after successful creation
   };
 

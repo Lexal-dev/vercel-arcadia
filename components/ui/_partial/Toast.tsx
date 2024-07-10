@@ -5,6 +5,7 @@ interface NekoToastProps {
   toastMessage: string;
 }
 
+export 
 const NekoToast: React.FC<NekoToastProps> = ({ toastType, toastMessage }) => {
   const getToastStyle = () => {
     switch (toastType) {
@@ -20,6 +21,8 @@ const NekoToast: React.FC<NekoToastProps> = ({ toastType, toastMessage }) => {
         return '';
     }
   };
+
+  
 
   return (
     <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg ${getToastStyle()} z-50`}>
