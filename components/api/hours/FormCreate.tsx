@@ -34,10 +34,10 @@ const FormCreate: React.FC<FormCreateProps> = ({ onClose, onCreate }) => {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-4 rounded shadow-lg w-full max-w-md text-black">
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="days">
+            <div className="flex flex-col items-center bg-foreground py-12 w-full md:w-1/2 rounded-lg">
+                <form onSubmit={handleSubmit} className='flex flex-col w-2/3 text-secondary'>
+                    <div className="mb-4 w-full">
+                        <label className="font-bold mb-2" htmlFor="days">
                             Jours
                         </label>
                         <input
@@ -45,12 +45,12 @@ const FormCreate: React.FC<FormCreateProps> = ({ onClose, onCreate }) => {
                             id="days"
                             value={days}
                             onChange={(e) => setDays(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded"
+                            className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
                             required
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="open">
+                        <label className="block font-bold mb-2" htmlFor="open">
                             Ouverture
                         </label>
                         <input
@@ -58,12 +58,12 @@ const FormCreate: React.FC<FormCreateProps> = ({ onClose, onCreate }) => {
                             id="open"
                             value={open}
                             onChange={(e) => setOpen(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded"
+                            className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
                             required
                         />
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="close">
+                    <div className="mb-12">
+                        <label className="block font-bold mb-2" htmlFor="close">
                             Fermeture
                         </label>
                         <input
@@ -71,17 +71,19 @@ const FormCreate: React.FC<FormCreateProps> = ({ onClose, onCreate }) => {
                             id="close"
                             value={close}
                             onChange={(e) => setClose(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded"
+                            className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
                             required
                         />
                     </div>
-                    <div className="flex justify-end">
-                        <button type="button" onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded mr-2">
-                            Annuler
-                        </button>
-                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+                    <div className="flex w-full justify-center  text-white">
+                        
+                        <button type="submit" className="w-1/2 bg-muted hover:bg-background py-2">
                             Créer
                         </button>
+                        <button type="button" onClick={onClose} className="w-1/2 bg-red-500 hover:bg-red-700 py-2">
+                            Annuler
+                        </button>
+
                     </div>
                 </form>
             </div>

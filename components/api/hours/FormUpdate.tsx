@@ -39,43 +39,45 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ hour, onClose, onUpdate }) => {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white p-8 rounded shadow-lg">
-                <form onSubmit={handleSubmit} className='text-black'>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="flex flex-col items-center bg-foreground py-12 w-full md:w-1/2 rounded-lg">
+                <form onSubmit={handleSubmit} className='flex flex-col w-2/3 text-secondary'>
                     <div className="mb-4">
-                        <label className="block text-gray-700">Jours</label>
+                        <label className="block font-bold mb-2">Jours</label>
                         <input
                             type="text"
                             value={days}
                             onChange={(e) => setDays(e.target.value)}
-                            className="w-full px-3 py-2 border rounded"
+                            className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700">Ouverture</label>
+                        <label className="block font-bold mb-2">Ouverture</label>
                         <input
                             type="text"
                             value={open}
                             onChange={(e) => setOpen(e.target.value)}
-                            className="w-full px-3 py-2 border rounded"
+                            className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
                         />
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-700">Fermeture</label>
+                    <div className="mb-12">
+                        <label className="block font-bold mb-2">Fermeture</label>
                         <input
                             type="text"
                             value={close}
                             onChange={(e) => setClose(e.target.value)}
-                            className="w-full px-3 py-2 border rounded"
+                            className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
                         />
                     </div>
-                    <div className="flex justify-end">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded mr-2">
-                            Annuler
-                        </button>
-                        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
+
+                    <div className="flex w-full justify-center  text-white">
+                        <button type="submit" className="w-1/2 bg-muted hover:bg-background py-2">
                             Mettre à jour
                         </button>
+                        <button type="button" onClick={onClose} className="w-1/2 bg-red-500 hover:bg-red-700 py-2">
+                            Annuler
+                        </button>
+
                     </div>
                 </form>
             </div>

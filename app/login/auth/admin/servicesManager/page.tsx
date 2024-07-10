@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import FormCreate from '@/components/api/services/FormCreate';
 import FormUpdate from '@/components/api/services/FormUpdate'; // Assurez-vous que le chemin vers FormUpdate est correct
 import Service from '@/models/service';
+import NekoToast from '@/components/ui/_partial/Toast';
+import { MdDelete, MdEdit } from 'react-icons/md';
 
 export default function ServicesManager() {
     const [services, setServices] = useState<Service[]>([]);
@@ -11,11 +13,11 @@ export default function ServicesManager() {
     const [showForm, setShowForm] = useState<boolean>(false); // État pour contrôler l'affichage de la modal de création
     const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false); // État pour contrôler l'affichage du formulaire de mise à jour
     const [selectedService, setSelectedService] = useState<Service | null>(null); // État pour stocker le service sélectionné pour la modification
-
+    const [toast, setToast] = useState<{ type: 'Success' | 'Error' | 'Delete' | 'Update'; message: string } | null>(null);
     // Fonction pour récupérer les services depuis l'API
-    const fetchServices = async () => {
+    const fetchServices = async (additionalParam: string | number) => {
         try {
-            const response = await fetch('/api/services/read');
+            const response = await fetch(`/api/services/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`)
             const data = await response.json();
             if (data.success) {
                 setServices(data.services);
@@ -32,7 +34,7 @@ export default function ServicesManager() {
 
     // Appeler fetchServices une seule fois au chargement du composant
     useEffect(() => {
-        fetchServices();
+        fetchServices('services');
     }, []);
 
     // Fonction pour supprimer un service
@@ -47,6 +49,7 @@ export default function ServicesManager() {
             } else {
                 console.error('Error deleting service:', data.message);
             }
+            showToast('Delete', 'Service effacé avec succès.' );
         } catch (error) {
             console.error('Error deleting service:', error);
         }
@@ -54,14 +57,16 @@ export default function ServicesManager() {
 
     // Fonction pour gérer la réussite de la création d'un service
     const handleServiceCreated = async () => {
-        await fetchServices(); // Rafraîchir la liste des services après création
+        await fetchServices('services'); // Rafraîchir la liste des services après création
         setShowForm(false); // Fermer la modal après création
+        showToast('Success', 'Service créer avec succès.' );
     };
 
     // Fonction pour gérer la réussite de la mise à jour d'un service
     const handleServiceUpdated = async () => {
-        await fetchServices(); // Rafraîchir la liste des services après mise à jour
+        await fetchServices('services'); // Rafraîchir la liste des services après mise à jour
         setShowUpdateForm(false); // Fermer le formulaire de mise à jour après succès
+        showToast('Update', 'Service mis à jour avec succès.' );
     };
 
     // Fonction pour ouvrir le formulaire de création
@@ -84,40 +89,57 @@ export default function ServicesManager() {
     if (error) {
         return <p>Error: {error}</p>;
     }
-
+   
+    
+    const showToast = (type: 'Success' | 'Error' | 'Delete' | 'Update', message: string) => {
+        setToast({ type, message });
+        setTimeout(() => {
+          setToast(null);
+        }, 3000); // Masquer le toast après 3 secondes
+      };
+        
+          
     // Rendu du composant principal
     return (
-        <main className='flex flex-col items-center p-12'>
-            <h1 className='text-2xl mb-4 font-bold'>Service Management</h1>
-            <div className="overflow-x-auto w-full max-w-4xl">
-                <table className='min-w-full bg-white text-black shadow-md rounded-lg'>
-                    <thead className='bg-gray-200'>
-                        <tr>
-                            <th className='py-3 px-6 border-b text-left'>ID</th>
-                            <th className='py-3 px-6 border-b text-left'>Name</th>
-                            <th className='py-3 px-6 border-b text-left'>Description</th>
-                            <th className='py-3 px-6 border-b text-center'>Actions</th>
+        <main className='flex flex-col items-center py-12'>
+        {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} timeSecond={3} onClose={() => setToast(null)} />}    
+            <h1 className='text-2xl mb-6 font-bold'>Gestionnaire Services</h1>
+            <button
+                onClick={openCreateForm}
+                className='bg-foreground hover:bg-muted-foreground hover:text-white text-secondary py-1 px-3 rounded-md mb-6'>
+                Ajouter un Service
+            </button>
+            <div className="overflow-x-auto w-full flex flex-col items-center">
+                <table className='shadow-md'>
+                    <thead className='bg-muted-foreground'>
+                        <tr className='w-full flex'>
+                            <th className='w-1/4 py-3 px-6 text-left'>Name</th>
+                            <th className='w-2/4 py-3 px-6 text-left'>Description</th>
+                            <th className='w-1/4 py-3 px-6 text-center'>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {services.map((service) => (
-                            <tr key={service.id} className='even:bg-gray-100'>
-                                <td className='py-3 px-6 border-b'>{service.id}</td>
-                                <td className='py-3 px-6 border-b'>{service.name}</td>
-                                <td className='py-3 px-6 border-b'>{service.description}</td>
-                                <td className='py-3 px-6 border-b text-center flex justify-center'>
-                                    <button
-                                        className='bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded mx-1 w-1/2'
-                                        onClick={() => handleDeleteService(service.id)}
-                                    >
-                                        Supprimer
-                                    </button>
-                                    <button
-                                        className='bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded mx-1 w-1/2'
-                                        onClick={() => openUpdateForm(service)}
-                                    >
-                                        Modifier
-                                    </button>
+                            <tr key={service.id} className='bg-muted hover:bg-background flex flex-row w-full'>
+                                <td className='w-1/4 py-3 px-6 border-b-2 border-background'>{service.name}</td>
+                                <td className='w-2/4 py-3 px-6 border-b-2 border-background'>{service.description}</td>
+                                <td className='w-1/4 py-3 px-6 border-b-2 border-background'>
+                                    <div className='text-center flex justify-center gap-4'>
+                                        <button
+                                            className='text-red-500 hover:text-red-600'
+                                            onClick={() => handleDeleteService(service.id)}
+                                        >
+                                            <MdDelete size={24} />
+                                        </button>
+                                        <button
+                                            className='text-yellow-500 hover:text-yellow-600'
+                                            onClick={() => openUpdateForm(service)}
+                                        >
+                                            
+                                            <MdEdit size={24} />
+                                        </button>                                        
+                                    </div>
+
                                 </td>
                             </tr>
                         ))}
@@ -125,11 +147,6 @@ export default function ServicesManager() {
                 </table>
             </div>
 
-            <button
-                onClick={openCreateForm}
-                className='bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md mt-4'>
-                Ajouter un Service
-            </button>
 
             {/* Afficher le formulaire de création */}
             {showForm && (

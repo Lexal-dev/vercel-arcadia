@@ -3,27 +3,34 @@ import React, { useEffect, useState } from 'react';
 import Hour from '@/models/hour';
 import FormUpdate from '@/components/api/hours/FormUpdate'; // Correct import
 import FormCreate from '@/components/api/hours/FormCreate'; // Correct import
+import { MdDelete, MdEdit } from 'react-icons/md';
+import NekoToast from '@/components/ui/_partial/Toast';
 
 export default function HoursManager() {
     const [hours, setHours] = useState<Hour[]>([]);
     const [selectedHour, setSelectedHour] = useState<Hour | null>(null);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [toast, setToast] = useState<{ type: 'Success' | 'Error' | 'Delete' | 'Update'; message: string } | null>(null);
+
+    const fetchHours = async (additionalParam: string | number) => {
+        try {
+            const response = await fetch(`/api/hours/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`, {
+                method: 'GET',
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                setHours(data.hours);
+            } else {
+                console.error('Failed to fetch hours:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching hours:', error);
+        }
+    };
 
     useEffect(() => {
-        fetch('/api/hours/read', {
-            method: 'GET',
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    setHours(data.hours);
-                } else {
-                    console.error('Failed to fetch hours:', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching hours:', error);
-            });
+        fetchHours('hours');
     }, []);
 
     const handleUpdateClick = (hour: Hour) => {
@@ -32,6 +39,7 @@ export default function HoursManager() {
 
     const handleUpdate = (updatedHour: Hour) => {
         setHours(hours.map(hour => hour.id === updatedHour.id ? updatedHour : hour));
+        showToast('Update', 'Horraire modifier avec succès' );
     };
 
     const handleCreateClick = () => {
@@ -40,6 +48,7 @@ export default function HoursManager() {
 
     const handleCreate = (newHour: Hour) => {
         setHours([...hours, newHour]);
+        showToast('Success', 'Horraire crée avec succès' );
     };
 
     const handleClose = () => {
@@ -63,50 +72,58 @@ export default function HoursManager() {
             } else {
                 console.error('Failed to delete hour:', data.message);
             }
+            showToast('Delete', 'Horraire effacée avec succès' );
         } catch (error) {
             console.error('Error deleting hour:', error);
         }
     };
-
+    const showToast = (type: 'Success' | 'Error' | 'Delete' | 'Update', message: string) => {
+        setToast({ type, message });
+        setTimeout(() => {
+          setToast(null);
+        }, 3000); // Masquer le toast après 3 secondes
+      };
     return (
-        <main className="flex flex-col container mx-auto p-4 items-center">
+        <main className="flex flex-col py-12 items-center">
+            {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} timeSecond={3} onClose={() => setToast(null)} />}
             <button
                 onClick={handleCreateClick}
-                className="bg-green-500 text-white px-4 py-2 rounded mb-4"
+                className="bg-foreground hover:bg-muted-foreground hover:text-white text-secondary py-1 px-3 rounded-md mb-6"
             >
                 Ajouter un horaire
             </button>
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border-gray-200 shadow-md rounded text-black">
-                    <thead>
-                        <tr className="bg-gray-100 border-b">
-                            <th className="py-2 px-4 border-r">ID</th>
-                            <th className="py-2 px-4 border-r">Jours</th>
-                            <th className="py-2 px-4 border-r">Ouverture</th>
-                            <th className="py-2 px-4 border-r">Fermeture</th>
-                            <th className="py-2 px-4">Actions</th>
+            <div className="overflow-x-auto w-full flex flex-col items-center">
+                <table className="w-full md:w-2/3 shadow-md">
+                    <thead className="bg-muted-foreground">
+                        <tr>
+                            <th className="py-3 px-2 text-left">Jours</th>
+                            <th className="py-3 px-2 text-left">Ouverture</th>
+                            <th className="py-3 px-2 text-left">Fermeture</th>
+                            <th className="py-3 px-2 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {hours.map(hour => (
-                            <tr key={hour.id} className="border-b hover:bg-gray-50 text-center">
-                                <td className="py-2 px-4 border-r">{hour.id}</td>
-                                <td className="py-2 px-4 border-r">{hour.days}</td>
-                                <td className="py-2 px-4 border-r">{hour.open}</td>
-                                <td className="py-2 px-4 border-r">{hour.close}</td>
-                                <td className="py-2 px-4">
-                                    <button
-                                        onClick={() => handleUpdateClick(hour)}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
-                                    >
-                                        Mettre à jour
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(hour.id)}
-                                        className="bg-red-500 text-white px-4 py-2 rounded"
-                                    >
-                                        Supprimer
-                                    </button>
+                            <tr key={hour.id} className="bg-foreground text-secondary hover:bg-muted">
+                                <td className="py-3 px-2 border-b-2 border-background">{hour.days}</td>
+                                <td className="py-3 px-2 border-b-2 border-background">{hour.open}</td>
+                                <td className="py-3 px-2 border-b-2 border-background">{hour.close}</td>
+                                <td className="py-3 px-2 border-b-2 border-background">
+                                    <div className='flex justify-center gap-4'>
+                                        <button
+                                            onClick={() => handleUpdateClick(hour)}
+                                            className="text-yellow-500 hover:text-yellow-600 text-[24px] md:text-[36px]"
+                                        >
+                                            <MdEdit  />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(hour.id)}
+                                            className="text-red-500 hover:text-red-600 text-[24px] md:text-[36px]"
+                                        >
+                                            <MdDelete  />
+                                        </button>
+                                    </div>
+
                                 </td>
                             </tr>
                         ))}

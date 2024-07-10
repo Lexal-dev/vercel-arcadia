@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { storage } from '@/lib/firebaseConfig';
 import { ref, deleteObject } from 'firebase/storage';
 import { useRouter } from 'next/navigation'; // Utilisation de useRouter au lieu de next/navigation
+import { MdEdit } from 'react-icons/md';
+import NekoToast from '@/components/ui/_partial/Toast';
 
 interface Habitat {
     id: number;
@@ -14,6 +16,7 @@ interface Habitat {
     imageUrl: string[];
 }
 
+
 export default function ImageManager() {
     const [habitats, setHabitats] = useState<Habitat[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -21,6 +24,7 @@ export default function ImageManager() {
     const [selectedHabitat, setSelectedHabitat] = useState<Habitat | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const router = useRouter();
+    const [toast, setToast] = useState<{ type: 'Success' | 'Error' | 'Delete' | 'Update'; message: string } | null>(null);
 
     // Fonction pour vérifier si l'URL est valide pour next/image
     function isValidUrl(url: string) {
@@ -84,6 +88,7 @@ export default function ImageManager() {
     
                 setHabitats(updatedHabitats);
                 closeModal();
+                showToast('Delete', 'Image url et image effacé.' );
             } else {
                 setError(data.error || 'Failed to delete imageUrl');
             }
@@ -136,6 +141,7 @@ export default function ImageManager() {
             }
             return hab;
         });
+        showToast('Success', 'Image et Image Url bien ajouté.' );
         setHabitats(updatedHabitats);
     };
 
@@ -149,35 +155,38 @@ export default function ImageManager() {
         return <p>Error: {error}</p>;
     }
 
-    // Rendu principal de la page
+    const showToast = (type: 'Success' | 'Error' | 'Delete' | 'Update', message: string) => {
+        setToast({ type, message });
+        setTimeout(() => {
+          setToast(null);
+        }, 3000); // Masquer le toast après 3 secondes
+      };
     return (
         <main className='flex flex-col items-center p-12'>
+            {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} timeSecond={3} onClose={() => setToast(null)} />}
             <h1 className='text-2xl mb-4 font-bold'>Habitats Management</h1>
-            <div className="overflow-x-auto w-full max-w-4xl">
-                <table className='min-w-full bg-white text-black shadow-md rounded-lg'>
-                    <thead className='bg-gray-200'>
+            <div className="overflow-x-auto w-full flex flex-col items-center">
+                <table className='w-full md:w-2/3 shadow-md'>
+                    <thead className='bg-muted-foreground'>
                         <tr>
-                            <th className='py-3 px-6 border-b text-left'>ID</th>
-                            <th className='py-3 px-6 border-b text-left'>Name</th>
-                            <th className='py-3 px-6 border-b text-left'>Description</th>
-                            <th className='py-3 px-6 border-b text-left'>Comment</th>
-                            <th className='py-3 px-6 border-b text-left'>Action</th>
+                            <th className='py-3 px-2 text-left'>Name</th>
+                            <th className='py-3 px-2 text-left'>Description</th>
+                            <th className='py-3 px-2 text-left'>Comment</th>
+                            <th className='py-3 px-2 text-center'>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {habitats.map((habitat) => (
-                            <tr key={habitat.id} className='even:bg-gray-100'>
-                                <td className='py-3 px-6 border-b'>{habitat.id}</td>
-                                <td className='py-3 px-6 border-b'>{habitat.name}</td>
-                                <td className='py-3 px-6 border-b'>{habitat.description}</td>
-                                <td className='py-3 px-6 border-b'>{habitat.comment}</td>
-                                <td className='py-3 px-6 border-b text-center flex justify-center'>
-                                    <button
-                                        onClick={() => openModal(habitat)}
-                                        className='mr-2 text-blue-500'
-                                    >
-                                        Modifier
-                                    </button>
+                            <tr key={habitat.id} className='bg-foreground text-secondary hover:bg-muted'>
+                                <td className='py-3 px-2 border-b-2 border-background'>{habitat.name}</td>
+                                <td className='py-3 px-2 border-b-2 border-background'>{habitat.description}</td>
+                                <td className='py-3 px-2 border-b-2 border-background'>{habitat.comment}</td>
+                                <td className='py-3 px-2 border-b-2 border-background'>
+                                    <div className='flex justify-center gap-4'>
+                                        <button onClick={() => openModal(habitat)} className="text-yellow-500 hover:text-yellow-600 text-[24px] md:text-[36px]">
+                                            <MdEdit  />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -190,22 +199,20 @@ export default function ImageManager() {
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                     <div className="flex flex-col justify-between modal-content min-w-[1000px] min-h-[500px] bg-white text-black p-8 rounded-lg shadow-lg">
                         <div className='flex justify-between items-center mb-4'>
-                            <h2 className="w-full text-4xl font-bold text-center">URL/IMAGES -&gt; {selectedHabitat.name}</h2>
+                            <h2 className="w-full text-4xl font-bold text-center">Images {selectedHabitat.name}</h2>
                             <span className="cursor-pointer text-4xl hover:text-red-500" onClick={closeModal}>&times;</span>
                         </div>
                         
-                        <div className='flex flex-col w-full items-around'>
+                        <div className='flex flex-col md:flex-row w-full'>
                             <ul className='flex flex-wrap items-start justify-start'>
                                 {/* Affichage des images de l'habitat */}
                                 {selectedHabitat.imageUrl && selectedHabitat.imageUrl.map((url, index) => (
                                     <li key={index} className=' p-2' onClick={() => handleImageClick(url)}>
                                         {isValidUrl(url) ? (
-                                            <div className='w-full flex gap-3'>
+                                            <div className='w-full flex flex-col'>
                                                 <Image src={url} width={200}  height={200} alt={`Image ${index}`} />
                                                 <div className='flex flex-col justify-between items-start'>
-                                                    <small>{url}</small>
-                                                    {/* Bouton pour supprimer une image */}
-                                                    <button onClick={() => deleteImageUrl(selectedHabitat.id, index, url)} className="ml-2 text-red-500 hover:text-red-700">
+                                                    <button onClick={() => deleteImageUrl(selectedHabitat.id, index, url)} className="w-full text-white border-t-2 border-green-100 bg-red-500 bg:text-red-700">
                                                         Supprimer
                                                     </button>
                                                 </div>

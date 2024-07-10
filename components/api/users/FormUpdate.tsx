@@ -48,25 +48,28 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ user, onUpdateSuccess, onClose 
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-md w-1/3">
-        <button onClick={onClose} className="w-full flex justify-end text-red-500 hover:text-red-700 "><MdClose size={36} /></button>
-        <form onSubmit={handleUpdateUser} className='text-black'>
+      <div className="bg-foreground p-6 rounded shadow-md w-1/2 text-secondary">
+        <div className='flex w-full justify-between mb-6'>
+            <h1 className='w-3/4 text-3xl font-bold'>Mise à jour utilisateurs</h1>
+            <button onClick={onClose} className="text-red-500 hover:text-red-700"><MdClose size={36} /></button>
+        </div>
+        <form onSubmit={handleUpdateUser}>
           <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
+            <label className="block">Email</label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Rôle</label>
+            <label className="block">Rôle</label>
             <select
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
               required
             >
               <option value="EMPLOYEE">EMPLOYEE</option>
@@ -74,15 +77,15 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ user, onUpdateSuccess, onClose 
             </select>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Nouveau Mot de Passe</label>
+            <label className="block">Nouveau Mot de Passe</label>
             <input
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-muted hover:bg-background text-white mb-6"
             />
           </div>
-          <button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600 border border-yellow-600 hover:border-yellow-700 text-white py-2 px-4 rounded">
+          <button type="submit" className="w-full bg-muted hover:bg-background text-white py-2 px-4 rounded">
             Mettre à Jour
           </button>
         </form>

@@ -1,7 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { redirectIfNeeded } from '@/lib/redirectApi';
 import User from '@/models/user';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    const additionalParam = req.query.additionalParam;
+    if (additionalParam !== 'users') {
+        if (redirectIfNeeded(req, res, '/api/services/read', '/')) {
+            return;
+        }
+    }
     if (req.method === 'GET') {
         try {
             const users = await User.findAll({ order: [['id', 'ASC']] });

@@ -12,42 +12,32 @@ const FormCreate: React.FC<FormCreateProps> = ({ onCreateSuccess }) => {
     name: '',
     raceId: '',
     habitatId: '',
-    etat: 'bon' // Définir une valeur par défaut pour 'etat'
+    etat: 'Bonne santé' // Définir une valeur par défaut pour 'etat'
   });
 
+
+  const [races, setRaces] = useState<Race[]>([]);
   const [habitats, setHabitats] = useState<Habitat[]>([]);
-  const [races, setRaces] = useState<Race[]>([]); // État pour stocker les races disponibles
 
-  useEffect(() => {
-    // Fetch des habitats
-    fetch('/api/habitats/read')
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.success) {
-          setHabitats(data.habitats);
-        } else {
-          console.error('Failed to fetch habitats:', data.message);
-        }
-      })
-      .catch(error => console.error('Error fetching habitats:', error));
-
-    // Fetch des races
-    fetch('/api/races/read')
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.success) {
-          setRaces(data.races);
-        } else {
-          console.error('Failed to fetch races:', data.message);
-        }
-      })
-      .catch(error => console.error('Error fetching races:', error));
-  }, []);
+    const fetchAnimals = async (additionalParam: string | number) => {
+      fetch(`/api/animals/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.success) {
+            setRaces(data.races);
+            setHabitats(data.habitats);
+          } else {
+            console.error('Failed to fetch data:', data.message);
+          }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+  useEffect(() => {fetchAnimals('animals')}, []);
 
   const handleCreateAnimal = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Vérifier si les champs requis sont remplis
+      
       if (!formData.name || !formData.raceId || !formData.habitatId || !formData.etat) {
         console.error('Le nom, raceId, habitatId et l\'état sont requis.');
         return;
@@ -68,12 +58,12 @@ const FormCreate: React.FC<FormCreateProps> = ({ onCreateSuccess }) => {
 
       const data = await response.json();
       if (data.success) {
-        onCreateSuccess(); // Appeler la fonction de succès pour fermer la modal
+        onCreateSuccess();
         setFormData({
           name: '',
           raceId: '',
           habitatId: '',
-          etat: 'bon' // Réinitialiser l'état à sa valeur par défaut après la création
+          etat: 'Bonne santé' 
         });
       } else {
         console.error('Erreur lors de la création de l\'animal:', data.message);
@@ -95,27 +85,26 @@ const FormCreate: React.FC<FormCreateProps> = ({ onCreateSuccess }) => {
     setFormData({ ...formData, habitatId: e.target.value });
   };
 
-  // Étant donné que 'etat' est défini par défaut à 'bon', il n'est pas nécessaire de changer sa valeur
 
   return (
-    <div className="">
-      <form onSubmit={handleCreateAnimal} className="text-black">
+    <div>
+      <form onSubmit={handleCreateAnimal} className='text-white'>
         <div className="mb-4">
-          <label className="block text-gray-700">Nom</label>
+          <label className="block text-secondary">Nom</label>
           <input
             type="text"
             value={formData.name}
             onChange={handleNameChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded w-full p-2 border rounded text-white bg-muted hover:bg-background mb-6"
             required
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700">Race</label>
+          <label className="block text-secondary">Race</label>
           <select
             value={formData.raceId}
             onChange={handleRaceChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-white bg-muted hover:bg-background mb-6"
             required
           >
             <option value="">Sélectionnez une race</option>
@@ -127,11 +116,11 @@ const FormCreate: React.FC<FormCreateProps> = ({ onCreateSuccess }) => {
           </select>
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700">Habitat</label>
+          <label className="block text-secondary">Habitat</label>
           <select
             value={formData.habitatId}
             onChange={handleHabitatChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-white bg-muted hover:bg-background mb-6"
             required
           >
             <option value="">Sélectionnez un habitat</option>
@@ -147,14 +136,14 @@ const FormCreate: React.FC<FormCreateProps> = ({ onCreateSuccess }) => {
           <input
             type="text"
             value={formData.etat}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-white bg-muted hover:bg-background mb-6"
             disabled // Désactiver l'édition du champ 'etat'
             hidden
           />
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          className="w-full bg-muted hover:bg-background text-white py-2 px-4 rounded"
         >
           Créer Animal
         </button>

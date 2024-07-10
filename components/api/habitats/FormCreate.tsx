@@ -46,45 +46,45 @@ const FormCreate: React.FC<FormCreateProps> = ({ onCreateSuccess, onClose }) => 
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div className="bg-white p-8 rounded-lg w-full max-w-md">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="flex flex-col items-center bg-foreground py-12 w-full md:w-1/2 rounded-lg">
                 <button onClick={onClose} className="w-full flex justify-end text-red-500 hover:text-red-700"><MdClose size={36} /></button>
-                <form onSubmit={handleSubmit} className="text-black">
+                <form onSubmit={handleSubmit} className="flex flex-col w-2/3 text-secondary">
                     {error && <p className="text-red-500 mb-2">{error}</p>}
                     <div className="mb-4">
-                        <label className="block text-gray-700">Name</label>
+                        <label className="font-bold mb-2">Name</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
                             required
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700">Description</label>
+                        <label className="font-bold mb-2">Description</label>
                         <input
                             type="text"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
                             required
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700">Comment</label>
+                        <label className="font-bold mb-2">Comment</label>
                         <textarea
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
                         />
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-green-500 hover:bg-green-600 border border-green-600 hover:border-green-700 text-white py-2 px-4 rounded"
+                        className="w-full bg-muted hover:bg-background text-white py-2"
                         disabled={loading}
                     >
-                        {loading ? 'Creating...' : 'Create Habitat'}
+                        {loading ? 'Creating...' : 'Ajouter un Habitat'}
                     </button>
                 </form>
             </div>

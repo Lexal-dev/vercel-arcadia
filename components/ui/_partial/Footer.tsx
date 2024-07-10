@@ -5,21 +5,25 @@ import Hours from '@/models/hour';
 export default function Footer() {
     const [hours, setHours] = useState<Hours[]>([]);
 
-    useEffect(() => {
-        fetch('/api/hours/read', {
-            method: 'GET',
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    setHours(data.hours);
-                } else {
-                    console.error('Failed to fetch hours:', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching hours:', error);
+    const fetchHours = async (additionalParam: string | number) => {
+        try {
+            const response = await fetch(`/api/hours/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`, {
+                method: 'GET',
             });
+
+            const data = await response.json();
+            if (data.success) {
+                setHours(data.hours);
+            } else {
+                console.error('Failed to fetch hours:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching hours:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchHours('hours');
     }, []);
 
     return (

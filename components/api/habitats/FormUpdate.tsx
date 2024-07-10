@@ -50,41 +50,41 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ habitat, onUpdateSuccess, onClo
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-md w-1/3">
+      <div className="flex flex-col items-center bg-foreground py-12 w-full md:w-1/2 rounded-lg">
         <button onClick={onClose} className="w-full flex justify-end text-red-500 hover:text-red-700">
           <MdClose size={36} />
         </button>
-        <form onSubmit={handleUpdateHabitat} className="text-black">
+        <form onSubmit={handleUpdateHabitat} className="flex flex-col w-2/3 text-secondary">
           <div className="mb-4">
-            <label className="block text-gray-700">Nom</label>
+            <label className="block font-bold mb-2">Nom</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Description</label>
+            <label className="block font-bold mb-2">Description</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Commentaire</label>
+          <div className="mb-12">
+            <label className="block font-bold mb-2">Commentaire</label>
             <textarea
               value={formData.comment}
               onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-muted hover:bg-background text-white"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 border border-yellow-600 hover:border-yellow-700 text-white py-2 px-4 rounded"
+            className="w-full bg-muted hover:bg-background py-2 text-white"
           >
             Mettre à Jour
           </button>

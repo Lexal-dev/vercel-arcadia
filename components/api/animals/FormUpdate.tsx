@@ -22,19 +22,20 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ animal, onUpdateSuccess, onClos
   const [races, setRaces] = useState<Race[]>([]);
   const [habitats, setHabitats] = useState<Habitat[]>([]);
 
-  useEffect(() => {
-    fetch('/api/animals/read')
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.success) {
-          setRaces(data.races);
-          setHabitats(data.habitats);
-        } else {
-          console.error('Failed to fetch data:', data.message);
-        }
-      })
-      .catch(error => console.error('Error fetching data:', error));
-  }, []);
+    const fetchAnimals = async (additionalParam: string | number) => {
+      fetch(`/api/animals/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.success) {
+            setRaces(data.races);
+            setHabitats(data.habitats);
+          } else {
+            console.error('Failed to fetch data:', data.message);
+          }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+  useEffect(() => {fetchAnimals('animals')}, []);
 
   const handleUpdateAnimal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,28 +92,28 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ animal, onUpdateSuccess, onClos
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-md w-1/3">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-1">
+      <div className="bg-foreground text-secondary p-6 rounded shadow-md md:w-2/3 w-full">
         <button onClick={onClose} className="w-full flex justify-end text-red-500 hover:text-red-700">
           <MdClose size={36} />
         </button>
-        <form onSubmit={handleUpdateAnimal} className="text-black">
+        <form onSubmit={handleUpdateAnimal}>
           <div className="mb-4">
-            <label className="block text-gray-700">Nom</label>
+            <label className="block text-text-secondary">Nom</label>
             <input
               type="text"
               value={formData.name}
               onChange={handleNameChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-white bg-muted hover:bg-background"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Race</label>
+            <label className="block text-text-secondary">Race</label>
             <select
               value={formData.raceId}
               onChange={handleRaceChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-white bg-muted hover:bg-background"
               required
             >
               <option value="">Sélectionnez une race</option>
@@ -124,11 +125,11 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ animal, onUpdateSuccess, onClos
             </select>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Habitat</label>
+            <label className="block text-text-secondary">Habitat</label>
             <select
               value={formData.habitatId}
               onChange={handleHabitatChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-white bg-muted hover:bg-background mb-6"
               required
             >
               <option value="">Sélectionnez un habitat</option>
@@ -143,7 +144,7 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ animal, onUpdateSuccess, onClos
           <input type="hidden" name="etat" defaultValue={animal.etat} />
           <button
             type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 border border-yellow-600 hover:border-yellow-700 text-white py-2 px-4 rounded"
+            className="w-full bg-muted hover:bg-background text-white py-2 px-4 rounded"
           >
             Mettre à Jour
           </button>

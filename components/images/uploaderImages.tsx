@@ -110,16 +110,19 @@ const ImageUploader = <T extends { id: number; [key: string]: any }>({ folderNam
     };
 
     return (
-        <div className="mt-4">
-            <input type="file" onChange={handleFileChange} />
+        <div className="mt-4 flex flex-col w-full">
+            <input type="file" onChange={handleFileChange}/>
             {error && <p className="text-red-500">{error}</p>}
-            <button
-                className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleUpload}
-                disabled={uploading}
-            >
-                {uploading ? 'Uploading...' : 'Upload Image'}
-            </button>
+            <div className='flex justify-center'>
+                <button
+                    className="mt-2 bg-muted hover:bg-background text-white font-bold py-2 px-4 rounded"
+                    onClick={handleUpload}
+                    disabled={uploading}
+                >
+                    {uploading ? 'Uploading...' : "Envoyer l'image"}
+                </button>                
+            </div>
+
         </div>
     );
 };

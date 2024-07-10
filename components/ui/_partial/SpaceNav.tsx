@@ -30,8 +30,10 @@ const SpaceNav: React.FC= () => {
         { name: "Dashboard", path: "/login/auth/admin/dashboard", roles: ["ADMIN"] },
         { name: "Utilisateurs", path: "/login/auth/admin/usersManager", roles: ["ADMIN"] },
         { name: "Animaux", path: "/login/auth/admin/animalsManager", roles: ["ADMIN"] },
+        { name: "Animaux-Images", path: "/login/auth/admin/animalsManager/imageManager", roles: ["ADMIN"] },
         { name: "Rapports-Vétérinaire", path: "/login/auth/admin/showVetLogs", roles: ["ADMIN"] },
         { name: "Habitats", path: "/login/auth/admin/habitatsManager", roles: ["ADMIN"] },
+        { name: "Habitats-Images", path: "/login/auth/admin/habitatsManager/imageManager", roles: ["ADMIN"] },
         { name: "Services-Manager", path: "/login/auth/admin/servicesManager", roles: ["ADMIN"] },
         { name: "horraires", path: "/login/auth/admin/hoursManager", roles: ["ADMIN"] },
 

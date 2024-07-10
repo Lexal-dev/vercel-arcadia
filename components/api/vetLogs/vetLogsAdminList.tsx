@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Animal from '@/models/animal';
 import Habitat from '@/models/habitat';
 import VetLog from '@/models/vetLogs';
-
+import { TbHandFinger } from "react-icons/tb";
 export default function VetLogsAdminList() {
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [habitats, setHabitats] = useState<Habitat[]>([]);
@@ -13,20 +13,22 @@ export default function VetLogsAdminList() {
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch('/api/animals/read')
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.success) {
-          setAnimals(data.animals);
-          setHabitats(data.habitats);
-          setVetLogs(data.vetLogs);
-        } else {
-          console.error('Failed to fetch data:', data.message);
-        }
-      })
-      .catch(error => console.error('Error fetching data:', error));
-  }, []);
+    const fetchAnimals = async (additionalParam: string | number) => {
+      fetch(`/api/animals/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.success) {
+            setAnimals(data.animals);
+            setHabitats(data.habitats);
+            setVetLogs(data.vetLogs);
+          } else {
+            console.error('Failed to fetch data:', data.message);
+          }
+        })
+        .catch(error => console.error('Error fetching data:', error));      
+    }
+
+  useEffect(() => {fetchAnimals('animals')}, []);
 
   const handleHabitatChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const habitatName = event.target.value;
@@ -77,55 +79,66 @@ useEffect(() => {
     .filter(vetLog => !selectedDateFilter || new Date(vetLog.createdAt) >= new Date(selectedDateFilter))
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+
+
+    const getAnimalNameById = (id:number) => {
+      const animal = animals.find(animal => animal.id === id);
+      return animal ? animal.name : null;
+    };
   return (
-    <div className="container mx-auto mt-8">
-      <h1 className="text-3xl font-bold mb-4 text-center">Consultations Vétérinaires</h1>
+    <div className=''>
+      <h1 className="text-3xl font-bold mb-12 text-center">Consultations Vétérinaires</h1>
+      <div className="w-full flex flex-col md:flex-row gap-x-6">
+        <div className="w-full flex flex-col items-center md:items-start mb-6  md:mb-0 items-start md:w-1/4">
+          <div className="flex flex-col items-start">
+            <h2 className="text-xl font-bold mb-2">Liste des Animaux</h2>
+            <select
+              onChange={handleHabitatChange}
+              className="p-2 border rounded-md bg-gray-100 shadow-md text-secondary mb-2">
+              <option value="">Sélectionnez un habitat</option>
+              {habitats.map(habitat => (
+                <option key={habitat.id} value={habitat.name}>
+                  {habitat.name}
+                </option>
+              ))}
+            </select>
+          </div> 
 
-      <div className="flex gap-4 mb-4 justify-center text-black">
-        <select
-          onChange={handleHabitatChange}
-          className="p-2 border rounded-md bg-gray-100 shadow-md">
-          <option value="">Sélectionnez un habitat</option>
-          {habitats.map(habitat => (
-            <option key={habitat.id} value={habitat.name}>
-              {habitat.name}
-            </option>
-          ))}
-        </select>
-
-        <input
-          type="date"
-          className="p-2 border rounded-md bg-gray-100 shadow-md"
-          onChange={handleDateFilterChange}
-        />
-      </div>
-      
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="col-span-1">
-          <h2 className="text-xl font-bold mb-2">Liste des Animaux</h2>
-          <ul className="divide-y divide-gray-200">
+          <ul>
             {filteredAnimals.map(animal => (
               <li
                 key={animal.id}
                 onClick={() => handleAnimalClick(animal.id)}
-                className="cursor-pointer py-2 hover:bg-gray-50">
-                {animal.name} - {animal.raceId}
+                className="cursor-pointer p-2 hover:bg-muted rounded-md hover:text-green-200">
+                <div className='flex gap-2 items-center'>
+                  <p>
+                    {animal.name} - {animal.raceId} 
+                  </p>
+                   <TbHandFinger size={20}/>
+                </div>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="col-span-2">
-          <h2 className="text-xl font-bold mb-2">Détails des Consultations</h2>
-          <div className="overflow-y-auto max-h-96 bg-gray-100 rounded-md p-4 shadow-md text-black">
+        <div className="w-full md:w-3/4">
+          
+          <div className="flex flex-col items-center">
+            <h2 className="text-xl font-bold mb-2">Détails des Consultations</h2>
+            <input
+              type="date"
+              className="p-2 border rounded-md bg-gray-100 shadow-md mb-2"
+              onChange={handleDateFilterChange}
+            />
+          </div>
+          <div className="overflow-y-auto max-h-96 bg-foreground text-secondary rounded-md p-4 shadow-mdk">
             {filteredVetLogs.length === 0 ? (
               <p>Aucune consultation trouvée.</p>
             ) : (
-              <ul className="divide-y divide-gray-200">
+              <ul>
                 {filteredVetLogs.map(vetLog => (
                   <li key={vetLog.id} className="py-2">
-                    <p className="text-lg font-bold mb-1">{selectedAnimal ? selectedAnimal?.name : vetLog.animalId}</p>
+                    <p className="text-lg font-bold mb-1">{selectedAnimal ? selectedAnimal?.name : getAnimalNameById(vetLog.animalId)}</p>
                     <p>Santé: {vetLog.animalState}</p>
                     <p>Nourriture donnée: {vetLog.foodOffered}</p>
                     <p>Quantité: {vetLog.foodWeight}g</p>

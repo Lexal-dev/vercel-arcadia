@@ -1,7 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Hours from '@/models/hour';
+import { redirectIfNeeded } from '@/lib/redirectApi';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+
+    
+  const additionalParam = req.query.additionalParam;
+
+  if (additionalParam !== 'hours') {
+    if (redirectIfNeeded(req, res, '/api/hours/read', '/')) {
+      return;
+    }
+  }
     if (req.method === 'GET') {
         try {
             const hours = await Hours.findAll({

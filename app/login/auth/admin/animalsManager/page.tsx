@@ -1,9 +1,13 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { ref, deleteObject } from 'firebase/storage';
+import { storage } from '@/lib/firebaseConfig';
 import Animal from '@/models/animal';
 import Habitat from '@/models/habitat';
 import FormUpdate from '@/components/api/animals/FormUpdate';
 import FormCreate from '@/components/api/animals/FormCreate';
+import NekoToast from '@/components/ui/_partial/Toast';
+import { MdDelete, MdEdit } from 'react-icons/md';
 
 export default function AnimalsManager() {
   const [animals, setAnimals] = useState<Animal[]>([]);
@@ -12,6 +16,7 @@ export default function AnimalsManager() {
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [showFormUpdate, setShowFormUpdate] = useState<boolean>(false); // State for update form visibility
   const [showFormCreate, setShowFormCreate] = useState<boolean>(false); // State for create form visibility
+  const [toast, setToast] = useState<{ type: 'Success' | 'Error' | 'Delete' | 'Update'; message: string } | null>(null);
 
   useEffect(() => {
     fetchAnimals('animals');
@@ -39,29 +44,63 @@ export default function AnimalsManager() {
   };
 
   const handleDeleteAnimal = async (id: number) => {
-    try {
-      const response = await fetch(`/api/animals/delete?id=${encodeURIComponent(id.toString())}`, {
-        method: 'DELETE',
-      });
-      const data = await response.json();
-      if (data.success) {
-        setAnimals(animals.filter(animal => animal.id !== id));
-      } else {
-        console.error('Error deleting animal:', data.message);
-      }
-    } catch (error) {
-      console.error('Error deleting animal:', error);
+    const animalToDelete = animals.find(animal => animal.id === id);
+    const animalToDeleteUrl = animalToDelete?.imageUrl;
+    if (!animalToDelete) {
+        console.error('Animal not found for deletion:', id);
+        return;
     }
-  };
+
+    // Suppression des images associées
+    try {
+        if (animalToDeleteUrl && animalToDeleteUrl.length > 0) {
+            for (const imageUrl of animalToDeleteUrl) {
+                await deleteImageFromStorage(imageUrl);
+            }
+        }
+    } catch (error) {
+        console.error('Error deleting images from storage:', error);
+        return; 
+    }
+
+    // Suppression de l'animal après suppression des images
+    try {
+        const response = await fetch(`/api/animals/delete?id=${encodeURIComponent(id.toString())}`, {
+            method: 'DELETE',
+        });
+        const data = await response.json();
+        if (data.success) {
+            setAnimals(animals.filter(animal => animal.id !== id));
+            showToast('Delete', 'Animal effacé avec succès.');
+        } else {
+            console.error('Error deleting animal:', data.message);
+        }
+    } catch (error) {
+        console.error('Error deleting animal:', error);
+    }
+};
+
+  const deleteImageFromStorage = async (imageUrlToDelete: string) => {
+    try {
+        const storageRef = ref(storage, imageUrlToDelete);
+        await deleteObject(storageRef);
+        console.log('Successfully deleted image from storage:', imageUrlToDelete);
+    } catch (error) {
+        console.error('Error deleting image from storage:', error);
+        throw new Error('Failed to delete image from storage');
+    }
+};
 
   const handleUpdateSuccess = async () => {
     await fetchAnimals('animals'); // Refresh animal list after update
     setShowFormUpdate(false); // Close update form after successful update
+    showToast('Update', 'Animal modifié avec succès !');
   };
 
   const handleCreateSuccess = async () => {
     await fetchAnimals('animals'); // Refresh animal list after creation
     setShowFormCreate(false); // Close create form after successful creation
+    showToast('Success', 'Animal créer avec succés !');
   };
 
   // Filter animals based on selected habitat name
@@ -69,10 +108,27 @@ export default function AnimalsManager() {
     ? animals.filter(animal => animal.habitatId.toString() === selectedHabitatName)
     : animals;
 
+    const showToast = (type: 'Success' | 'Error' | 'Delete' | 'Update', message: string) => {
+      setToast({ type, message });
+      setTimeout(() => {
+        setToast(null);
+      }, 3000); // Masquer le toast après 3 secondes
+    };
+
   return (
-    <>
-      <div className='w-full flex flex-col justify-center items-center py-4'>
-        <select onChange={handleHabitatChange} className='text-black p-1 rounded-md bg-slate-300 h-[50px] w-[150px]'>
+    <main className='w-full  py-12'>
+      <div className='w-full flex flex-col justify-center items-center'>
+      {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} timeSecond={3} onClose={() => setToast(null)} />}
+
+        {!showFormUpdate && (
+          <button
+            onClick={() => setShowFormCreate(true)}
+            className="bg-foreground hover:bg-muted-foreground hover:text-white text-secondary py-1 px-3 rounded-md mb-6"
+          >
+            Créer Animal
+          </button>
+        )}
+        <select onChange={handleHabitatChange} className='text-black p-1 rounded-md bg-slate-300 mb-2'>
           <option value="">Tous les habitats</option>
           {habitats.map(habitat => (
             <option key={habitat.id} value={habitat.name}>
@@ -80,21 +136,12 @@ export default function AnimalsManager() {
             </option>
           ))}
         </select>
-        {!showFormUpdate && (
-          <button
-            onClick={() => setShowFormCreate(true)}
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mt-4 h-[50px] w-[150px]"
-          >
-            Créer Animal
-          </button>
-        )}
       </div>
 
-      <div className='w-full'>
-        <table className='min-w-full bg-white text-black shadow-md rounded-lg'>
-          <thead className='bg-gray-200'>
+      <div className='overflow-x-auto w-full flex flex-col items-center'>
+        <table className='shadow-md'>
+          <thead className='bg-muted-foreground'>
             <tr>
-              <th className='py-3 px-6 border-b text-left'>ID</th>
               <th className='py-3 px-6 border-b text-left'>Nom</th>
               <th className='py-3 px-6 border-b text-left'>Race</th>
               <th className='py-3 px-6 border-b text-left'>Habitat</th>
@@ -103,27 +150,29 @@ export default function AnimalsManager() {
           </thead>
           <tbody>
             {filteredAnimals.map(animal => (
-              <tr key={animal.id} className='cursor-pointer hover:bg-gray-100'>
-                <td className='py-3 px-6 border-b'>{animal.id}</td>
-                <td className='py-3 px-6 border-b'>{animal.name}</td>
-                <td className='py-3 px-6 border-b'>{animal.raceId}</td>
-                <td className='py-3 px-6 border-b'>{animal.habitatId}</td>
-                <td className='py-3 px-6 border-b flex'>
-                  <button
-                    className='bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded mx-1 w-1/2'
-                    onClick={() => handleDeleteAnimal(animal.id)}
-                  >
-                    Supprimer
-                  </button>
-                  <button
-                    className='bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded mx-1 w-1/2'
-                    onClick={() => {
-                      setSelectedAnimal(animal);
-                      setShowFormUpdate(true);
-                    }}
-                  >
-                    Modifier
-                  </button>
+              <tr key={animal.id} className='bg-muted hover:bg-background'>
+                <td className='py-3 px-6 border-b-2 border-background'>{animal.name}</td>
+                <td className='py-3 px-6 border-b-2 border-background'>{animal.raceId}</td>
+                <td className='py-3 px-6 border-b-2 border-background'>{animal.habitatId}</td>
+                <td className='py-3 px-6 border-b-2 border-background'>
+                  <div className="flex justify-center">
+                    <button 
+                      className='text-yellow-500 hover:text-yellow-600'
+                      onClick={() => {
+                        setSelectedAnimal(animal);
+                        setShowFormUpdate(true);
+                      }}
+                    >
+                      <MdEdit size={24} />
+                    </button>                  
+                    <button
+                      className='text-red-500 hover:text-red-600'
+                      onClick={() => handleDeleteAnimal(animal.id)}
+                    >
+                      <MdDelete size={24} />
+                    </button>                    
+                  </div>
+
                 </td>
               </tr>
             ))}
@@ -151,9 +200,8 @@ export default function AnimalsManager() {
       )}
 
       {showFormCreate && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-black opacity-50"></div>
-          <div className="bg-white p-8 rounded-lg z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-1">
+          <div className="bg-foreground text-secondary p-6 rounded shadow-md md:w-2/3 w-full">
             <button
               onClick={() => setShowFormCreate(false)}
               className="w-full text-end text-xl text-red-500 hover:text-red-600 hover:text-2xl"
@@ -164,6 +212,6 @@ export default function AnimalsManager() {
           </div>
         </div>
       )}
-    </>
+    </main>
   );
 }
