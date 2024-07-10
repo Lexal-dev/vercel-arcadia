@@ -6,7 +6,7 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
     
     return (
             <section className="w-full">
-                <SpaceNav role="EMPLOYEE"/>
+                <SpaceNav/>
                 {children}
             </section>
     );

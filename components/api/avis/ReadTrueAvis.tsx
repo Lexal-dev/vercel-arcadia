@@ -42,7 +42,7 @@ const AvisList: React.FC = () => {
   return (
     <div className="avis-list border-2 p-4 rounded-md bg-muted">
       {avisList.length > 0 ? (
-        <ul className="flex flex-wrap justify-center h-[500px] gap-4 overflow-y">
+        <ul className="flex flex-wrap justify-center h-[500px] gap-4 overflow-y-auto">
           {generateRandomIndexes(avisList.length, 20).map((index) => (
             <li key={avisList[index].id} className="border border-slate-200 p-2 rounded-lg bg-muted-foreground w-[350px]">
               <div className="flex items-center gap-2 mb-12 pt-2">

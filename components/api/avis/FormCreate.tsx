@@ -33,12 +33,12 @@ export default function FormCreate() {
             setToast({ type: 'Error', message: 'Un problème est survenu lors de la création de l\'avis.' });
         }
 
-        setTimeout(() => setToast(null), 3000);
+        setTimeout(() => setToast(null), 3000); // Ferme le toast après 3 secondes
     };
 
     return (
         <>
-            {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} />}
+            {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} timeSecond={3} onClose={() => setToast(null)} />}
             <h1 className='font-bold text-4xl text-center mb-10'>Votre avis</h1>
             <form onSubmit={handleSubmit} className='flex flex-col min-w-[300px] border-2 border-slate-300 rounded-md p-6 gap-6 bg-muted'>
                 <div className='flex flex-col gap-6'>

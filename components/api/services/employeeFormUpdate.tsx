@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { MdClose } from 'react-icons/md';
-import NekoToast from '@/components/ui/_partial/Toast'; // Assurez-vous que le chemin d'import est correct
+import NekoToast from '@/components/ui/_partial/Toast';
 
 interface Service {
   id: number;
@@ -56,10 +56,7 @@ const FormUpdate: React.FC<ServiceUpdateFormProps> = ({ service, onUpdateSuccess
       const data = await response.json();
       if (data.success) {
         setToast({ type: 'Success', message: 'Service mis à jour avec succès.' });
-        setTimeout(() => {
-          setToast(null);
-          onUpdateSuccess();
-        }, 3000); // Masquer le toast après 3 secondes et appeler onUpdateSuccess
+        onUpdateSuccess(); // Appeler la fonction onUpdateSuccess
       } else {
         setServerError(data.message); // Capturer le message d'erreur du serveur
       }
@@ -71,7 +68,7 @@ const FormUpdate: React.FC<ServiceUpdateFormProps> = ({ service, onUpdateSuccess
 
   return (
     <div className='fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'>
-      {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} />}
+      {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} timeSecond={3} onClose={() => {onUpdateSuccess()}}/>}
       <div className='flex flex-col justify-between bg-foreground p-6 rounded-lg text-secondary w-[600px] h-[400px]'>
         <button onClick={onClose} className="flex justify-end text-red-500 hover:text-red-700">
           <MdClose size={24} />

@@ -42,6 +42,10 @@ VetLog.init(
                 notEmpty: {
                     msg: 'Le champ état de l\'animal ne peut pas être vide.',
                 },
+                len: {
+                    args: [3, 100],
+                    msg: 'Le champ état de l\'animal doit avoir entre 3 et 100 caractères.',
+                },
             },
         },
         foodOffered: {
@@ -50,6 +54,10 @@ VetLog.init(
             validate: {
                 notEmpty: {
                     msg: 'Le champ nourriture proposée ne peut pas être vide.',
+                },
+                len: {
+                    args: [3, 50],
+                    msg: 'Le champ nourriture proposée doit avoir entre 3 et 50 caractères.',
                 },
             },
         },
@@ -61,7 +69,7 @@ VetLog.init(
                     msg: 'Le champ grammage de la nourriture doit être un nombre.',
                 },
                 min: {
-                    args: [0.1],
+                    args: [0],
                     msg: 'Le champ grammage de la nourriture doit être supérieur à zéro.',
                 },
             },

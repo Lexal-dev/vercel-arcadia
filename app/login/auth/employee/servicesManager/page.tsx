@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { MdEdit } from 'react-icons/md';
 import FormUpdate from '@/components/api/services/employeeFormUpdate';
+import NekoToast from '@/components/ui/_partial/Toast';
 
 interface Service {
   id: number;
@@ -12,6 +13,7 @@ interface Service {
 export default function ServiceManager() {
   const [services, setServices] = useState<Service[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [toast, setToast] = useState<{ type: 'Success' | 'Error' | 'Delete' | 'Update'; message: string } | null>(null);
 
   const fetchServices = async (additionalParam: string | number) => {
     try {
@@ -25,8 +27,9 @@ export default function ServiceManager() {
       } else {
         throw new Error(data.message || 'Failed to fetch services');
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error fetching services:', error);
+      showToast('Error', `Erreur lors de la récupération des services: ${error.message}`);
     }
   };
 
@@ -39,16 +42,26 @@ export default function ServiceManager() {
   };
 
   const handleUpdateSuccess = () => {
-    setSelectedService(null);
     fetchServices('default'); // Replace 'default' with the actual parameter you need
+    setSelectedService(null);
+    showToast('Success', 'Service mis à jour avec succès.');
+  };
+
+  const showToast = (type: 'Success' | 'Error' | 'Delete' | 'Update', message: string) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast(null);
+    }, 3000); // Masquer le toast après 3 secondes
   };
 
   return (
     <main className="w-full flex-col flex py-12 px-2 items-center">
+      {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} timeSecond={3} onClose={() => setToast(null)} />}
+
       <div className="lg:w-2/3 overflow-x-auto  shadow-md md:rounded-lg">
         <table className="w-full table-auto">
           <thead>
-            <tr className="bg-gray-800 text-white">
+            <tr className="bg-muted-foreground text-white">
               <th className="w-1/5 px-4 py-2 text-left">Nom</th>
               <th className="w-3/5 px-4 py-2 text-left">Description</th>
               <th className="w-1/5 px-4 py-2 text-center">Actions</th>

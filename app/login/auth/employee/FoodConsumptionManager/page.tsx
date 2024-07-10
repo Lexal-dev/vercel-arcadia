@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Animal from '@/models/animal';
 import Habitat from '@/models/habitat';
-import { MdDelete, MdEdit } from 'react-icons/md';
+import { MdEdit } from 'react-icons/md';
 import { NekoToast } from '@/components/ui/_partial/Toast';
 
 const AnimalsManager = () => {
@@ -35,24 +35,6 @@ const AnimalsManager = () => {
     setSelectedHabitatName(habitatName !== "" ? habitatName : null);
   };
 
-  const handleDeleteAnimal = async (id: number) => {
-    try {
-      const response = await fetch(`/api/animals/delete?id=${encodeURIComponent(id.toString())}`, {
-        method: 'DELETE',
-      });
-      const data = await response.json();
-      if (data.success) {
-        setAnimals(animals.filter(animal => animal.id !== id));
-        showToast('Delete', 'Animal supprimé avec succès.');
-      } else {
-        console.error('Error deleting animal:', data.message);
-        showToast('Error', `Erreur lors de la suppression de l'animal: ${data.message}`);
-      }
-    } catch (error:any) {
-      console.error('Error deleting animal:', error);
-      showToast('Error', `Erreur lors de la suppression de l'animal: ${error.message}`);
-    }
-  };
 
   const openModal = (animal: Animal) => {
     setSelectedAnimal(animal);
@@ -109,11 +91,10 @@ const AnimalsManager = () => {
         setToast(null);
     }, 3000); // Masquer le toast après 3 secondes
   };
-
+  
   useEffect(() => {
     fetchAnimals('animals');
   }, []);
-  
   const filteredAnimals = selectedHabitatName
     ? animals.filter(animal => animal.habitatId.toString() === selectedHabitatName)
     : animals;
@@ -123,7 +104,7 @@ const AnimalsManager = () => {
     <main className='w-full flex flex-col justify-center px-2 items-center py-6'>
 
       <div className='mb-4'>
-        {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} />}
+        {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} timeSecond={3} onClose={() => setToast(null)}/>}
         <select onChange={handleHabitatChange} className='text-black p-1 rounded-md bg-slate-300 h-[50px] w-[150px]'>
           <option value="">Tous les habitats</option>
           {habitats.map(habitat => (
@@ -156,12 +137,6 @@ const AnimalsManager = () => {
                     className='text-green-600 hover:text-green-700'
                   >
                     <MdEdit size={24} />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteAnimal(animal.id)}
-                    className='text-red-500 hover:text-red-600'
-                  >
-                    <MdDelete size={24} />
                   </button>
                 </td>
               </tr>

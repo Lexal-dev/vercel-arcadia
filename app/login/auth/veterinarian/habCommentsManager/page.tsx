@@ -1,21 +1,20 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import FormUpdate from '@/components/api/habitats/FormUpdateComments'; // Importer le composant FormUpdate
+import FormUpdate from '@/components/api/habitats/FormUpdateComments';
 import Habitat from '@/models/habitat';
+import NekoToast from '@/components/ui/_partial/Toast';
+import { MdEdit } from 'react-icons/md';
 
 const HabitatsComments: React.FC = () => {
     const [habitats, setHabitats] = useState<Habitat[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [toast, setToast] = useState<{ type: 'Success' | 'Error' | 'Delete' | 'Update'; message: string } | null>(null);
+    const [selectedHabitat, setSelectedHabitat] = useState<Habitat | null>(null); 
 
-    const [selectedHabitat, setSelectedHabitat] = useState<Habitat | null>(null); // State to hold selected habitat for update
-
-
-
-    // Function to fetch habitats from API
-    const fetchHabitats = async () => {
+    const fetchHabitats = async (additionalParam: string | number) => {
         try {
-            const response = await fetch('/api/habitats/read');
+            const response = await fetch(`/api/habitats/read?additionalParam=${encodeURIComponent(additionalParam.toString())}`);
             const data = await response.json();
             if (data.success) {
                 setHabitats(data.habitats);
@@ -30,24 +29,17 @@ const HabitatsComments: React.FC = () => {
         }
     };
 
-
-
-    // Function to open the update form
     const openUpdateForm = (habitat: Habitat) => {
         setSelectedHabitat(habitat);
     };
 
-    // Function to close the update form
     const closeUpdateForm = () => {
         setSelectedHabitat(null);
     };
 
-    // Fetch habitats when component mounts
     useEffect(() => {
-        fetchHabitats();
+        fetchHabitats('defaultParam');
     }, []);
-
- 
 
     if (loading) {
         return <p>Loading...</p>;
@@ -58,34 +50,38 @@ const HabitatsComments: React.FC = () => {
     }
 
     return (
-        <main className='flex flex-col items-center p-12'>
-
+        <main className='flex flex-col items-center px-1 py-12'>
+            {toast && (
+                <NekoToast 
+                    toastType={toast.type} 
+                    toastMessage={toast.message} 
+                    timeSecond={3} 
+                    onClose={() => setToast(null)}
+                />
+            )}
             <h1 className='text-2xl mb-4 font-bold'>Habitats Management</h1>
-            <div className="overflow-x-auto w-full max-w-4xl">
-
-                <table className='min-w-full bg-white text-black shadow-md rounded-lg'>
-                    <thead className='bg-gray-200'>
-                        <tr>
-                            <th className='py-3 px-6 border-b text-center'>ID</th>
-                            <th className='py-3 px-6 border-b text-center'>Name</th>
-                            <th className='py-3 px-6 border-b text-center'>Description</th>
-                            <th className='py-3 px-6 border-b text-center'>Comment</th>
-                            <th className='py-3 px-6 border-b text-center'>Action</th>
+            <div className="w-full lg:w-2/3 overflow-x-auto shadow-md md:rounded-lg">
+                <table className='w-full table-auto'>
+                    <thead>
+                        <tr className='bg-muted-foreground text-white'>
+                            <th className='px-4 py-2 text-center'>Name</th>
+                            <th className='px-4 py-2 text-center'>Description</th>
+                            <th className='px-4 py-2 text-center'>Comment</th>
+                            <th className='px-4 py-2 text-center'>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {habitats.map((habitat) => (
-                            <tr key={habitat.id} className='even:bg-gray-100'>
-                                <td className='py-3 px-6 border-b'>{habitat.id}</td>
-                                <td className='py-3 px-6 border-b'>{habitat.name}</td>
-                                <td className='py-3 px-6 border-b'>{habitat.description}</td>
-                                <td className='py-3 px-6 border-b'>{habitat.comment}</td>
-                                <td className='py-3 px-6 border-b text-center flex justify-center items-center'>
+                            <tr key={habitat.id} className='border-t bg-foreground text-secondary hover:bg-muted hover:text-white'>
+                                <td className='px-4 py-2'>{habitat.name}</td>
+                                <td className='px-4 py-2'>{habitat.description}</td>
+                                <td className='px-4 py-2'>{habitat.comment}</td>
+                                <td className='w-full min-h-[100px] flex flex-col justify-center items-center'>
                                     <button
-                                        className='bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded'
+                                        className='text-yellow-500 hover:text-yellow-700'
                                         onClick={() => openUpdateForm(habitat)}
                                     >
-                                        Modifier
+                                        <MdEdit size={32} />
                                     </button>
                                 </td>
                             </tr>
@@ -94,14 +90,14 @@ const HabitatsComments: React.FC = () => {
                 </table>
             </div>
 
-
             {/* FormUpdate component */}
             {selectedHabitat && (
                 <FormUpdate
                     habitat={selectedHabitat}
                     onUpdateSuccess={() => {
-                        fetchHabitats(); // Refresh habitats list after update
-                        closeUpdateForm(); // Close the update form after successful update
+                        setToast({ type: 'Success', message: `Commentaire sur l'habitat [${selectedHabitat.name}] modifié.` });
+                        fetchHabitats('defaultParam');
+                        closeUpdateForm(); 
                     }}
                     onClose={closeUpdateForm}
                 />

@@ -51,41 +51,46 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ vetLogId, vetLog }) => {
 
   return (
     <div className="w-full">
-      <div className="bg-white p-6">
-        <form onSubmit={handleUpdateVetLog} className="text-black">
+      <div className="p-6">
+        <form onSubmit={handleUpdateVetLog} className="text-secondary">
           <div className="mb-4">
-            <label className="block text-gray-700">État de l&apos;animal</label>
+            <label className="block">État de l&apos;animal</label>
             <input
               type="text"
               value={formData.animalState}
               onChange={(e) => setFormData({ ...formData, animalState: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="p-2 border border-gray-300 bg-background text-white hover:bg-muted-foreground rounded-md w-full"
               required
+              minLength={3}
+              maxLength={100}
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Nourriture offerte</label>
+            <label className="block">Nourriture à donnée</label>
             <input
               type="text"
               value={formData.foodOffered}
               onChange={(e) => setFormData({ ...formData, foodOffered: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="p-2 border border-gray-300 bg-background text-white hover:bg-muted-foreground rounded-md w-full"
               required
+              minLength={3}
+              maxLength={50}
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Poids de la nourriture (g)</label>
+            <label className="block">Poids de la nourriture (g)</label>
             <input
               type="number"
               value={formData.foodWeight}
               onChange={(e) => setFormData({ ...formData, foodWeight: Number(e.target.value) })}
-              className="w-full p-2 border rounded"
+              className="p-2 border border-gray-300 bg-background text-white hover:bg-muted-foreground rounded-md w-full"
               required
+              min={0}
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 border border-yellow-600 hover:border-yellow-700 text-white py-2 px-4 rounded"
+            className="w-full bg-muted hover:bg-muted-foreground border text-white py-2 px-4 rounded"
           >
             Mettre à Jour
           </button>

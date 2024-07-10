@@ -4,7 +4,7 @@ export default function VetLogsManager() {
 
 
     return (
-        <main className="container mx-auto p-4">
+        <main className="flex flex-col items-center px-1 md:px-12 py-12">
             <VetLogList />
         </main>
     );

@@ -13,9 +13,20 @@ const FormCreate: React.FC<FormCreateProps> = ({ animalId, onCreate }) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Vérifier que tous les champs sont remplis
-    if (!animalState || !foodOffered || !foodWeight) {
-      alert('Veuillez remplir tous les champs.');
+    // Validation des contraintes
+    if (animalState.length < 3 || animalState.length > 100) {
+      alert('L\'état de l\'animal doit avoir entre 3 et 100 caractères.');
+      return;
+    }
+
+    if (foodOffered.length < 3 || foodOffered.length > 50) {
+      alert('La nourriture proposée doit avoir entre 3 et 50 caractères.');
+      return;
+    }
+
+    const parsedFoodWeight = parseFloat(foodWeight);
+    if (isNaN(parsedFoodWeight) || parsedFoodWeight <= 0) {
+      alert('Le grammage de la nourriture doit être un nombre supérieur à zéro.');
       return;
     }
 
@@ -24,7 +35,7 @@ const FormCreate: React.FC<FormCreateProps> = ({ animalId, onCreate }) => {
       animalId,
       animalState,
       foodOffered,
-      foodWeight: parseInt(foodWeight), // Assurez-vous que foodWeight est un nombre
+      foodWeight: parsedFoodWeight, // Assurez-vous que foodWeight est un nombre
     };
 
     // Appeler la fonction de création passée en props
@@ -37,42 +48,48 @@ const FormCreate: React.FC<FormCreateProps> = ({ animalId, onCreate }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4">
+    <form onSubmit={handleSubmit} className="mt-4 w-full md:w-2/4 mt-6 text-secondary">
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-700">État de l&apos;animal</label>
+        <label className="block text-sm font-medium">État de l&apos;animal</label>
         <input
           type="text"
           value={animalState}
           onChange={(e) => setAnimalState(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md w-full"
+          className="p-2 border border-gray-300 bg-muted text-white hover:bg-muted-foreground rounded-md w-full placeholder-slate-200"
           placeholder="État de l'animal"
           required
+          minLength={3}
+          maxLength={100}
         />
       </div>
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-700">Nourriture proposée</label>
+        <label className="block text-sm font-medium">Nourriture proposée</label>
         <input
           type="text"
           value={foodOffered}
           onChange={(e) => setFoodOffered(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md w-full"
+          className="p-2 border border-gray-300 bg-muted text-white hover:bg-muted-foreground rounded-md w-full placeholder-slate-200"
           placeholder="Nourriture proposée"
           required
+          minLength={3}
+          maxLength={50}
         />
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Grammage de la nourriture (en g)</label>
+        <label className="block text-sm font-medium">Grammage de la nourriture (en g)</label>
         <input
           type="number"
           value={foodWeight}
           onChange={(e) => setFoodWeight(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md w-full"
+          className="p-2 border border-gray-300 bg-muted text-white hover:bg-muted-foreground rounded-md w-full placeholder-slate-200"
           placeholder="Grammage de la nourriture"
           required
+          min="0" // Utilisation de l'attribut min pour le champ number
+          step="INTEGER" 
         />
       </div>
       
-        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md w-full">Créer vetLog</button>
+        <button type="submit" className="bg-muted hover:bg-muted-foreground text-white font-semibold py-2 px-4 rounded-md w-full">Créer vetLog</button>
     </form>
   );
 };

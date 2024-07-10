@@ -43,7 +43,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 }
             } else {
                 setUser(null);
-                router.push('/login');
+                router.push('/');
             }
             setLoading(false);
         };

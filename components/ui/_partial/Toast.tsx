@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface NekoToastProps {
   toastType: 'Success' | 'Error' | 'Delete' | 'Update'; // Ajout des types Delete et Update
   toastMessage: string;
+  timeSecond : number;
+  onClose: () => void; // Ajout d'une fonction de rappel pour fermer le toast
 }
 
-export 
-const NekoToast: React.FC<NekoToastProps> = ({ toastType, toastMessage }) => {
+export const NekoToast: React.FC<NekoToastProps> = ({ toastType, toastMessage, timeSecond, onClose }) => {
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose(); // Appeler la fonction onClose après 3 secondes
+    }, (timeSecond * 1000));
+
+    return () => clearTimeout(timer); // Nettoyer le timer si le composant est démonté
+  }, [onClose]);
+
   const getToastStyle = () => {
     switch (toastType) {
       case 'Success':
@@ -21,8 +31,6 @@ const NekoToast: React.FC<NekoToastProps> = ({ toastType, toastMessage }) => {
         return '';
     }
   };
-
-  
 
   return (
     <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg ${getToastStyle()} z-50`}>

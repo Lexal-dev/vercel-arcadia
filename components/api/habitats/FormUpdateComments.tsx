@@ -49,30 +49,33 @@ const FormUpdate: React.FC<FormUpdateProps> = ({ habitat, onUpdateSuccess, onClo
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-md w-1/3">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div className="flex flex-col justify-between bg-foreground p-6 rounded-lg text-secondary w-[600px] h-[400px]">
+
         <button onClick={onClose} className="w-full flex justify-end text-red-500 hover:text-red-700">
-          <MdClose size={36} />
+          <MdClose size={24} />
         </button>
 
-        <form onSubmit={handleUpdateHabitat} className="text-black">
+        <form onSubmit={handleUpdateHabitat} className="flex flex-col justify-between h-full">
           <div className="mb-4">
-            <label defaultValue={formData.name} className="block text-gray-700">{formData.name}</label>
+            <label defaultValue={formData.name} className="w-full bg-muted hover:bg-background text-white p-2 border rounded mb-4">{formData.name}</label>
           </div>
           <div className="mb-4">
-            <label defaultValue={formData.description} className="block text-gray-700">{formData.description}</label>
+            <label defaultValue={formData.description} className="w-full bg-muted hover:bg-background text-white p-2 border rounded mb-4">{formData.description}</label>
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Commentaire</label>
             <textarea
               value={formData.comment}
               onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full bg-background hover:bg-muted-foreground text-white p-2 border border-2 rounded"
+              minLength={3}
+              maxLength={200}
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 border border-yellow-600 hover:border-yellow-700 text-white py-2 px-4 rounded"
+            className="bg-muted hover:bg-muted-foreground text-white px-4 py-2 mt-4 rounded-md"
           >
             Mettre à Jour
           </button>

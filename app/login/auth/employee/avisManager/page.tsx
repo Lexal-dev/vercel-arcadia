@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { MdEdit, MdDelete } from 'react-icons/md';
-import NekoToast from '@/components/ui/_partial/Toast';
+import NekoToast from '@/components/ui/_partial/Toast'; // Assurez-vous que le chemin est correct
 
 interface Avis {
     id: number;
@@ -49,9 +49,9 @@ export default function AvisManager() {
     const showToast = (type: 'Success' | 'Error' | 'Delete' | 'Update', message: string) => {
         setToast({ type, message });
         setTimeout(() => {
-            setToast(null);
-        }, 3000); 
-    };
+          setToast(null);
+        }, 3000); // Masquer le toast après 3 secondes
+      };
 
     const filteredAvis = avisList.filter(a => {
         if (filter === 'all') return true;
@@ -101,8 +101,8 @@ export default function AvisManager() {
     };
 
     return (
-        <main className="w-full flex-col flex py-6 md:p-6 items-center">
-            {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} />}
+        <main className="w-full flex-col flex py-6 px-1 items-center">
+            {toast && <NekoToast toastType={toast.type} toastMessage={toast.message} timeSecond={3} onClose={() => setToast(null)} />}
             <div className="flex justify-between mb-1">
                 <div>
                     <button className={`px-4 py-2 text-black md:rounded ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`} onClick={() => setFilter('all')}>Tous</button>
@@ -110,7 +110,7 @@ export default function AvisManager() {
                     <button className={`px-4 py-2 ml-2 md:rounded text-black ${filter === 'invalid' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`} onClick={() => setFilter('invalid')}>Invalides</button>
                 </div>
             </div>
-            <div className="lg:w-2/3 overflow-x-auto bg-white shadow-md md:rounded-lg">
+            <div className="w-full lg:w-2/3 overflow-x-auto bg-white shadow-md md:rounded-lg">
                 <table className="w-full table-auto">
                     <thead>
                         <tr className="bg-muted-foreground">
@@ -118,7 +118,6 @@ export default function AvisManager() {
                             <th className="px-4 py-2 text-left">Commentaire</th>
                             {filter === 'all' && <th className="px-4 py-2 text-left">Validité</th>}
                             <th className="px-4 py-2 text-center">Actions</th>
-                            
                         </tr>
                     </thead>
                     <tbody>
